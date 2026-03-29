@@ -1,0 +1,6 @@
+{
+  "appId": "com.hipercontrol.app",
+  "appName": "HiperControl Pro",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
