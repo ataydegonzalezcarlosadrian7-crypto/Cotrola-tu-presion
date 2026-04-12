@@ -5,57 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>HiperControl</title>
     
+    <!-- Dependencias Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- PayPal SDK (Configurado con tu ID) -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAfL26d5SicSjimR9qBK_7H7To8HiLp0a8OllLcR7_WNeyZaXxHZrIhsBLlUT96GMSBhLuN0un3kw-aK8&components=hosted-buttons&disable-funding=venmo&currency=MXN"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
-        :root { --rose: #f43f5e; --slate: #0f172a; --emerald: #10b981; }
-        body { background: #f8fafc; font-family: 'Outfit', sans-serif; padding-bottom: 110px; overflow-x: hidden; }
+        
+        :root { 
+            --rose: #f43f5e; 
+            --slate: #0f172a; 
+            --emerald: #10b981; 
+        }
+
+        body { 
+            background: #f8fafc; 
+            font-family: 'Outfit', sans-serif; 
+            padding-bottom: 120px; 
+            overflow-x: hidden; 
+        }
+
         .page { display: none; }
         .page.active { display: block; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .card { background: white; border-radius: 1.5rem; padding: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .input-med { background: #f1f5f9; border: 2px solid #e2e8f0; border-radius: 1rem; padding: 0.8rem; width: 100%; font-weight: 700; outline: none; transition: 0.2s; }
+
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .card { 
+            background: white; 
+            border-radius: 1.5rem; 
+            padding: 1.5rem; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+        }
+
+        .input-med { 
+            background: #f1f5f9; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 1rem; 
+            padding: 0.8rem; 
+            width: 100%; 
+            font-weight: 700; 
+            outline: none; 
+            transition: 0.2s; 
+        }
+
         .input-med:focus { border-color: var(--rose); background: white; }
         .nav-active { color: var(--rose) !important; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
+
+        .modal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(8px); 
+            z-index: 9999; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+        }
+
         .btn-tap:active { transform: scale(0.95); }
-        .status-badge { font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 2rem; text-transform: uppercase; }
-        .sos-btn { display: flex; align-items: center; gap: 1rem; padding: 1.2rem; background: white; border-radius: 1.2rem; border-left: 6px solid #e2e8f0; text-decoration: none; color: inherit; margin-bottom: 0.8rem; }
         
-        /* Estilos Semáforo */
+        .status-badge { 
+            font-size: 0.65rem; 
+            font-weight: 800; 
+            padding: 0.2rem 0.6rem; 
+            border-radius: 2rem; 
+            text-transform: uppercase; 
+        }
+
+        .sos-btn { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            padding: 1.2rem; 
+            background: white; 
+            border-radius: 1.2rem; 
+            border-left: 6px solid #e2e8f0; 
+            text-decoration: none; 
+            color: inherit; 
+            margin-bottom: 0.8rem; 
+            transition: transform 0.2s;
+        }
+
+        /* Semáforo de Salud */
         .badge-verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
         .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        /* Estilo para botón de borrar */
         .delete-btn { color: #cbd5e1; transition: 0.3s; }
         .delete-btn:hover { color: #f43f5e; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- MODAL DE BIENVENIDA Y AVISO LEGAL (REQUERIDO PLAY STORE) -->
+    <!-- MODAL DE BIENVENIDA -->
     <div id="welcomeModal" class="modal" style="display: flex;">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm overflow-y-auto max-h-[80vh]" onclick="event.stopPropagation()">
-            <div class="text-center mb-6">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="text-center mb-6 shrink-0">
                 <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4">
                     <i class="fas fa-user-shield"></i>
                 </div>
                 <h3 class="font-black text-2xl italic">HiperControl</h3>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aviso Legal y Uso</p>
             </div>
-            <div class="space-y-4 text-[11px] font-medium text-slate-600 leading-relaxed text-justify mb-6">
+            <div class="overflow-y-auto pr-2 space-y-4 text-[11px] font-medium text-slate-600 leading-relaxed text-justify mb-6">
                 <p>⚠️ <strong>AVISO MÉDICO:</strong> Esta aplicación es una herramienta de apoyo para el registro y monitoreo de la presión arterial. <strong>No es un dispositivo médico</strong> y no sustituye el diagnóstico ni tratamiento de un profesional de la salud.</p>
-                <p>📊 <strong>FUNCIÓN:</strong> Registra tus mediciones diarias para facilitar el reporte a tu médico. Los colores mostrados son guías basadas en criterios generales de salud en México.</p>
-                <p>🛡️ <strong>PRIVACIDAD:</strong> Sus datos se almacenan de forma local en su dispositivo para su seguridad.</p>
-                <p>🏥 En caso de emergencia o síntomas graves, acuda inmediatamente al centro de salud más cercano.</p>
+                <p>📊 <strong>FUNCIÓN:</strong> Registra tus mediciones diarias para facilitar el reporte a tu médico. Los colores mostrados son guías basadas en criterios generales de salud internacional adaptados para México.</p>
+                <p>🛡️ <strong>PRIVACIDAD:</strong> Sus datos se almacenan de forma local en su dispositivo. HiperControl no sube sus registros médicos a servidores externos para proteger su intimidad.</p>
+                <p>🏥 En caso de emergencia o síntomas graves, acuda inmediatamente al centro de salud más cercano o llame al 911.</p>
             </div>
-            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase tracking-widest">Aceptar y Continuar</button>
+            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase tracking-widest shrink-0">Aceptar y Continuar</button>
         </div>
     </div>
 
@@ -74,14 +145,19 @@
         </div>
     </div>
 
-    <!-- MODAL DE EXPORTACIÓN Y ANUNCIOS -->
+    <!-- MODAL DE EXPORTACIÓN -->
     <div id="exportModal" class="modal" onclick="closeModals()">
         <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm" onclick="event.stopPropagation()">
             <h3 class="font-black text-2xl italic mb-2 text-center">Compartir Datos</h3>
             <p class="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 italic">Selecciona el formato de envío</p>
             <div class="space-y-3">
-                <button onclick="handleAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2"><i class="fas fa-copy"></i> COPIAR PARA WHATSAPP</button>
-                <button onclick="handleAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2"><i class="fas fa-file-pdf"></i> GENERAR PDF MÉDICO</button>
+                <button onclick="handleAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2">
+                    <i class="fas fa-copy"></i> COPIAR PARA WHATSAPP
+                </button>
+                <button onclick="handleAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2">
+                    <i class="fas fa-file-pdf"></i> GENERAR PDF MÉDICO
+                </button>
+                <!-- Contenedor PayPal -->
                 <div id="paypal-container-WL5JJ94G938SW" class="mt-4"></div>
             </div>
             <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase">Cerrar</button>
@@ -101,7 +177,7 @@
 
     <main class="p-6 max-w-md mx-auto">
 
-        <!-- REGISTROS Y TENSIÓN -->
+        <!-- PÁGINA: INICIO / SALUD -->
         <div id="page-home" class="page active">
             <div class="card mb-6">
                 <div class="flex gap-4 mb-4">
@@ -134,14 +210,15 @@
                 </button>
             </div>
             
-            <div id="unifiedTimeline" class="space-y-4 pb-20 relative">
-                <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100"></div>
+            <div id="unifiedTimeline" class="space-y-4 relative">
+                <!-- Timeline line rendering here -->
             </div>
         </div>
 
-        <!-- MEDICAMENTOS -->
+        <!-- PÁGINA: MEDICAMENTOS -->
         <div id="page-meds" class="page">
             <h2 class="text-3xl font-black italic mb-2">Recetario</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Gestiona tus tomas diarias</p>
             <div class="card mb-8">
                 <input type="text" id="mName" placeholder="Nombre (Ej: Enalapril 10mg)" class="input-med mb-3">
                 <div class="flex gap-2">
@@ -152,7 +229,7 @@
             <div id="medsList" class="space-y-3"></div>
         </div>
 
-        <!-- GUÍA VITAL -->
+        <!-- PÁGINA: GUÍA -->
         <div id="page-guide" class="page">
             <h2 class="text-3xl font-black italic mb-6">Guía Vital</h2>
             <div class="space-y-4">
@@ -167,34 +244,34 @@
                 <div class="card border-l-8 border-blue-500">
                     <h4 class="font-black italic text-sm mb-2">🧘 Hábitos Saludables</h4>
                     <p class="text-[11px] text-slate-500 font-bold uppercase leading-relaxed">
-                        Realice 150 minutos de actividad física a la semana. Mantenga un peso saludable para reducir la carga cardiaca.
+                        Realice 150 minutos de actividad física a la semana. Camine al menos 30 minutos diarios para fortalecer su corazón.
                     </p>
                 </div>
                 <div class="card border-l-8 border-rose-500">
-                    <h4 class="font-black italic text-sm mb-4">⚖️ Tabla de Valores (México)</h4>
+                    <h4 class="font-black italic text-sm mb-4">⚖️ Tabla de Valores</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between items-center border-b border-slate-50 pb-1">
-                            <span class="text-[10px] font-black text-emerald-600">NORMAL (VERDE)</span>
-                            <span class="text-xs font-black">< 120/80</span>
+                            <span class="text-[10px] font-black text-emerald-600">NORMAL</span>
+                            <span class="text-xs font-black">120 / 80</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-slate-50 pb-1">
-                            <span class="text-[10px] font-black text-amber-500">ALTA (AMARILLO)</span>
-                            <span class="text-xs font-black">130-139 / 85-89</span>
+                            <span class="text-[10px] font-black text-amber-500">ELEVADA</span>
+                            <span class="text-xs font-black">130 / 85</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-black text-rose-500">HIPERTENSIÓN (ROJO)</span>
-                            <span class="text-xs font-black">> 140/90</span>
+                            <span class="text-[10px] font-black text-rose-500">HIPERTENSIÓN</span>
+                            <span class="text-xs font-black">> 140 / 90</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CALCULADORA DE RIESGO -->
+        <!-- PÁGINA: RIESGO -->
         <div id="page-risk" class="page">
             <h2 class="text-3xl font-black italic mb-6">Riesgo CV</h2>
             <div class="card space-y-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Factores de Riesgo</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Calculadora rápida de factores</p>
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                     <span class="text-xs font-black italic">¿Fumador activo?</span>
                     <input type="checkbox" id="risk-smoke" class="w-6 h-6 accent-rose-500">
@@ -203,18 +280,18 @@
                     <span class="text-xs font-black italic">¿Diabetes?</span>
                     <input type="checkbox" id="risk-db" class="w-6 h-6 accent-rose-500">
                 </div>
-                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest">Calcular Score de Riesgo</button>
+                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest">Calcular Score</button>
                 <div id="riskResult" class="hidden p-4 rounded-xl text-center font-black italic"></div>
             </div>
         </div>
 
-        <!-- EMERGENCIAS SOS -->
+        <!-- PÁGINA: SOS -->
         <div id="page-sos" class="page">
             <h2 class="text-3xl font-black italic text-rose-600 mb-6">Centro SOS</h2>
             <div class="space-y-3">
                 <a href="tel:911" class="sos-btn border-rose-500 bg-rose-50 animate-pulse">
                     <div class="w-12 h-12 bg-rose-500 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-rose-200"><i class="fas fa-phone-alt"></i></div>
-                    <div><p class="font-black text-rose-600 text-lg italic">911 EMERGENCIAS</p><p class="text-[9px] font-bold text-rose-400 uppercase">Nacional México</p></div>
+                    <div><p class="font-black text-rose-600 text-lg italic">911 EMERGENCIAS</p><p class="text-[9px] font-bold text-rose-400 uppercase">Llamada inmediata</p></div>
                 </a>
                 <a href="tel:065" class="sos-btn border-red-600">
                     <div class="w-10 h-10 bg-slate-100 text-red-600 rounded-lg flex items-center justify-center"><i class="fas fa-ambulance"></i></div>
@@ -224,16 +301,12 @@
                     <div class="w-10 h-10 bg-slate-100 text-emerald-500 rounded-lg flex items-center justify-center"><i class="fas fa-hospital"></i></div>
                     <div><p class="font-black text-sm italic">ORIENTACIÓN IMSS</p></div>
                 </a>
-                <a href="tel:068" class="sos-btn border-orange-500">
-                    <div class="w-10 h-10 bg-slate-100 text-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-fire"></i></div>
-                    <div><p class="font-black text-sm italic">BOMBEROS</p></div>
-                </a>
             </div>
         </div>
 
     </main>
 
-    <!-- NAVEGACIÓN -->
+    <!-- BARRA DE NAVEGACIÓN -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 border-t border-slate-100 p-4 pb-8 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center text-[8px] font-black uppercase text-slate-300 tracking-tighter">
             <button onclick="tab('home', this)" class="flex flex-col items-center gap-1 nav-active flex-1"><i class="fas fa-heartbeat text-xl"></i>Salud</button>
@@ -247,6 +320,7 @@
     <div id="social-bar-container"></div>
 
     <script>
+        // Inicialización de datos
         let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
         let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
         let takes = JSON.parse(localStorage.getItem('hc_v12_takes')) || [];
@@ -255,23 +329,18 @@
         window.onload = () => {
             updateHeaderDate();
             renderAll();
-            initPaypal();
             
             if(localStorage.getItem('hc_v12_tos')) {
                 document.getElementById('welcomeModal').style.display = 'none';
             }
 
+            // Gestión de publicidad / Estado Pro
             if(!isPro) {
-                const s = document.createElement('script');
-                s.src = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
-                document.body.appendChild(s);
-                const socialScript = document.createElement('script');
-                socialScript.type = 'text/javascript';
-                socialScript.src = '//pl29004811.highperformanceformat.com/51/93/29/51932976be964860b2f5f1902891d3bd.js';
-                document.getElementById('social-bar-container').appendChild(socialScript);
+                initPaypal();
             } else {
                 document.getElementById('vTag').innerHTML = "V12 <i class='fas fa-check-circle text-blue-400 text-xs'></i>";
-                document.getElementById('social-bar-container').innerHTML = '';
+                const pContainer = document.getElementById('paypal-container-WL5JJ94G938SW');
+                if(pContainer) pContainer.innerHTML = '<p class="text-[9px] text-center font-bold text-emerald-500 uppercase">Versión Pro Activada</p>';
             }
         };
 
@@ -282,7 +351,8 @@
 
         function updateHeaderDate() {
             const d = new Date();
-            document.getElementById('headerDate').innerText = d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' });
+            const options = { weekday: 'long', day: 'numeric', month: 'short' };
+            document.getElementById('headerDate').innerText = d.toLocaleDateString('es-MX', options);
         }
 
         function tab(id, btn) {
@@ -290,29 +360,53 @@
             document.getElementById(`page-${id}`).classList.add('active');
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
             btn.classList.add('nav-active');
+            window.scrollTo(0, 0);
         }
 
         function saveHealth() {
-            const sys = parseInt(document.getElementById('sys').value);
-            const dia = parseInt(document.getElementById('dia').value);
+            const sysInput = document.getElementById('sys');
+            const diaInput = document.getElementById('dia');
             const momento = document.getElementById('momento').value;
             const peso = document.getElementById('peso').value;
+
+            const sys = parseInt(sysInput.value);
+            const dia = parseInt(diaInput.value);
+
             if(!sys || !dia) return;
 
             let status = { label: 'Normal', bg: 'badge-verde', color: 'text-emerald-700' };
             if(sys >= 140 || dia >= 90) {
-                status = { label: 'Crisis/HTA G1', bg: 'badge-rojo', color: 'text-rose-700' };
+                status = { label: 'Hipertensión', bg: 'badge-rojo', color: 'text-rose-700' };
             } else if (sys >= 130 || dia >= 85) {
                 status = { label: 'Elevada', bg: 'badge-amarillo', color: 'text-amber-700' };
             }
 
-            db.unshift({ id: Date.now(), type: 'pressure', sys, dia, momento, peso, date: Date.now(), status });
+            db.unshift({ 
+                id: Date.now(), 
+                type: 'pressure', 
+                sys, 
+                dia, 
+                momento, 
+                peso, 
+                date: Date.now(), 
+                status 
+            });
+
             save();
-            document.getElementById('sys').value = '';
-            document.getElementById('dia').value = '';
+            sysInput.value = '';
+            diaInput.value = '';
+            
+            // Retroalimentación visual
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "¡REGISTRADO!";
+            btn.classList.replace('bg-rose-500', 'bg-emerald-500');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-emerald-500', 'bg-rose-500');
+            }, 1500);
         }
 
-        // FUNCIONES DE ELIMINACIÓN
         function deleteRecord(id, type) {
             if(type === 'pressure') {
                 db = db.filter(x => x.id !== id);
@@ -329,8 +423,11 @@
         function clearAllData() {
             db = [];
             takes = [];
+            meds = [];
+            localStorage.clear();
             save();
             closeModals();
+            location.reload();
         }
 
         function addMedicine() {
@@ -357,12 +454,19 @@
         function renderAll() {
             const timeline = document.getElementById('unifiedTimeline');
             const combined = [...db, ...takes].sort((a,b) => b.date - a.date);
+            
             timeline.innerHTML = '<div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100"></div>';
-            if(combined.length === 0) timeline.innerHTML += '<p class="text-center py-10 text-[10px] font-black text-slate-300 uppercase italic">Sin registros</p>';
+            
+            if(combined.length === 0) {
+                timeline.innerHTML += '<p class="text-center py-10 text-[10px] font-black text-slate-300 uppercase italic">Sin registros aún</p>';
+                return;
+            }
 
             combined.forEach(item => {
-                const timeStr = new Date(item.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                const dayStr = new Date(item.date).toLocaleDateString([], {day:'2-digit', month:'short'});
+                const dateObj = new Date(item.date);
+                const timeStr = dateObj.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                const dayStr = dateObj.toLocaleDateString([], {day:'2-digit', month:'short'});
+
                 if(item.type === 'pressure') {
                     timeline.innerHTML += `
                         <div class="relative pl-14 mb-4">
@@ -402,19 +506,29 @@
                 }
             });
 
+            // Renderizar lista de medicamentos activos
             const mList = document.getElementById('medsList');
-            mList.innerHTML = meds.map(m => `
-                <div class="card flex justify-between items-center py-3">
-                    <div>
-                        <p class="font-black text-sm italic">${m.name}</p>
-                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${m.time || 'Sin hora'} HS</p>
+            if(meds.length === 0) {
+                mList.innerHTML = '<p class="text-center text-[10px] font-black text-slate-300 py-4 uppercase">No hay medicamentos configurados</p>';
+            } else {
+                mList.innerHTML = meds.map(m => `
+                    <div class="card flex justify-between items-center py-3">
+                        <div>
+                            <p class="font-black text-sm italic">${m.name}</p>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">${m.time || 'Sin hora'} HS</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="logTake('${m.name}')" class="w-10 h-10 bg-emerald-500 text-white rounded-xl shadow-md btn-tap flex items-center justify-center"><i class="fas fa-check text-xs"></i></button>
+                            <button onclick="deleteMedicine(${m.id})" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-xl btn-tap flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="logTake('${m.name}')" class="w-10 h-10 bg-emerald-500 text-white rounded-xl shadow-md btn-tap flex items-center justify-center"><i class="fas fa-check text-xs"></i></button>
-                        <button onclick="meds = meds.filter(x=>x.id!==${m.id}); save();" class="w-10 h-10 bg-slate-100 text-slate-400 rounded-xl btn-tap flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
+        }
+
+        function deleteMedicine(id) {
+            meds = meds.filter(x => x.id !== id);
+            save();
         }
 
         function calcRisk() {
@@ -423,27 +537,30 @@
             let score = 5;
             if(smoke) score += 10;
             if(dbCheck) score += 15;
+
             const res = document.getElementById('riskResult');
             res.classList.remove('hidden');
-            if(score < 10) { res.className = "p-4 rounded-xl text-center font-black italic bg-emerald-100 text-emerald-700"; res.innerText = "Riesgo Bajo ("+score+"%)"; }
-            else { res.className = "p-4 rounded-xl text-center font-black italic bg-rose-100 text-rose-700"; res.innerText = "Riesgo Elevado ("+score+"%) - Consulte a su médico."; }
+            
+            if(score < 10) { 
+                res.className = "p-4 rounded-xl text-center font-black italic bg-emerald-100 text-emerald-700"; 
+                res.innerText = "Riesgo Cardiovascular Bajo (" + score + "%)"; 
+            } else { 
+                res.className = "p-4 rounded-xl text-center font-black italic bg-rose-100 text-rose-700"; 
+                res.innerText = "Riesgo Elevado (" + score + "%) - Consulte a un cardiólogo."; 
+            }
         }
 
         function openExport() { document.getElementById('exportModal').style.display = 'flex'; }
+        
         function closeModals() { 
-            document.getElementById('exportModal').style.display = 'none'; 
-            document.getElementById('confirmDeleteModal').style.display = 'none';
+            document.querySelectorAll('.modal').forEach(m => {
+                if(m.id !== 'welcomeModal') m.style.display = 'none';
+            });
         }
 
         function handleAction(type) {
-            if(!isPro) {
-                const s = document.createElement('script');
-                s.src = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
-                document.body.appendChild(s);
-                setTimeout(() => { executeExport(type); }, 800);
-            } else {
-                executeExport(type);
-            }
+            // Lógica Pro/Anuncios si fuera necesario
+            executeExport(type);
         }
 
         function executeExport(type) {
@@ -453,33 +570,69 @@
 
         function copyToClipboard() {
             if(db.length === 0) return;
-            let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*TENSIÓN RECIENTE:*\n";
-            db.slice(0, 10).forEach(r => {
+            let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*ÚLTIMAS MEDICIONES:*\n";
+            db.slice(0, 15).forEach(r => {
                 t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.status.label})\n`;
             });
             t += "\n_Generado por HiperControl App_";
+            
             const area = document.createElement("textarea");
-            area.value = t; document.body.appendChild(area);
-            area.select(); document.execCommand("copy");
+            area.value = t;
+            document.body.appendChild(area);
+            area.select();
+            try {
+                document.execCommand("copy");
+                alert("¡Copiado al portapapeles!");
+            } catch (err) {
+                console.error("Error al copiar", err);
+            }
             document.body.removeChild(area);
             closeModals();
         }
 
         function generatePDF() {
+            if(db.length === 0) return;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.setFontSize(22); doc.setTextColor(244, 63, 94); doc.text("HiperControl - Reporte de Salud", 20, 20);
-            const rows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.status.label, r.momento]);
-            doc.autoTable({ head: [['Fecha', 'Tensión', 'Estado', 'Momento']], body: rows, startY: 30 });
-            doc.save("HiperControl_Reporte.pdf");
+            
+            doc.setFontSize(22);
+            doc.setTextColor(244, 63, 94);
+            doc.text("HiperControl - Reporte Médico", 20, 20);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text("Historial de presión arterial generado desde la aplicación.", 20, 28);
+
+            const rows = db.map(r => [
+                new Date(r.date).toLocaleDateString(), 
+                `${r.sys}/${r.dia}`, 
+                r.status.label, 
+                r.momento,
+                r.peso ? r.peso + "kg" : "-"
+            ]);
+
+            doc.autoTable({ 
+                head: [['Fecha', 'Tensión (mmHg)', 'Estado', 'Momento', 'Peso']], 
+                body: rows, 
+                startY: 35,
+                theme: 'striped',
+                headStyles: { fillStyle: [15, 23, 42] }
+            });
+
+            doc.save("Reporte_HiperControl.pdf");
             closeModals();
         }
 
         function initPaypal() {
+            const container = document.getElementById('paypal-container-WL5JJ94G938SW');
+            if(!container) return;
+            
             paypal.HostedButtons({
                 hostedButtonId: "WL5JJ94G938SW",
-                onApprove: () => {
-                    isPro = true; localStorage.setItem('hc_v12_pro', 'true');
+                onApprove: (data) => {
+                    isPro = true; 
+                    localStorage.setItem('hc_v12_pro', 'true');
+                    alert("¡Gracias por tu apoyo! Versión PRO activada.");
                     location.reload();
                 }
             }).render("#paypal-container-WL5JJ94G938SW");
