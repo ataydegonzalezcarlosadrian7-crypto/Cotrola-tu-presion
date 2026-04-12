@@ -86,7 +86,6 @@
             <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 italic">Historial y Síntomas</h3>
             <div id="unifiedTimeline" class="space-y-4 pb-20 relative">
                 <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100"></div>
-                <!-- Registros -->
             </div>
         </div>
 
@@ -103,10 +102,9 @@
             <div id="medsList" class="space-y-3"></div>
         </div>
 
-        <!-- GUÍA VITAL (NUEVA SECCIÓN) -->
+        <!-- GUÍA VITAL -->
         <div id="page-guide" class="page">
             <h2 class="text-3xl font-black italic mb-6">Guía Vital</h2>
-            
             <div class="space-y-4">
                 <div class="card border-l-8 border-emerald-500">
                     <h4 class="font-black italic text-sm mb-2">🍎 Alimentación DASH</h4>
@@ -116,14 +114,12 @@
                         <li>• <span class="text-slate-800">GRASAS:</span> Evite fritos y carnes rojas grasosas.</li>
                     </ul>
                 </div>
-
                 <div class="card border-l-8 border-blue-500">
                     <h4 class="font-black italic text-sm mb-2">🧘 Hábitos Saludables</h4>
                     <p class="text-[11px] text-slate-500 font-bold uppercase leading-relaxed">
                         Realice 150 minutos de actividad física a la semana. Mantenga un peso saludable para reducir la carga cardiaca.
                     </p>
                 </div>
-
                 <div class="card border-l-8 border-rose-500">
                     <h4 class="font-black italic text-sm mb-4">⚖️ Tabla de Valores</h4>
                     <div class="space-y-2">
@@ -202,6 +198,9 @@
         </div>
     </nav>
 
+    <!-- ANUNCIO SOCIAL BAR (Nativo) -->
+    <div id="social-bar-container"></div>
+
     <script>
         let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
         let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
@@ -212,12 +211,24 @@
             updateHeaderDate();
             renderAll();
             initPaypal();
+            
+            // Lógica de Anuncios: Solo si no es Pro
             if(!isPro) {
+                // 1. Cargar Banner Estándar
                 const s = document.createElement('script');
                 s.src = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
                 document.body.appendChild(s);
+
+                // 2. Cargar Social Bar Nativo
+                const socialScript = document.createElement('script');
+                socialScript.type = 'text/javascript';
+                socialScript.src = '//pl29004811.highperformanceformat.com/51/93/29/51932976be964860b2f5f1902891d3bd.js';
+                document.getElementById('social-bar-container').appendChild(socialScript);
             } else {
+                // Interfaz limpia para Pro
                 document.getElementById('vTag').innerHTML = "V12 <i class='fas fa-check-circle text-blue-400 text-xs'></i>";
+                // Asegurar que el contenedor social bar esté vacío
+                document.getElementById('social-bar-container').innerHTML = '';
             }
         };
 
@@ -341,18 +352,26 @@
 
         function handleAction(type) {
             if(!isPro) {
+                // Inyectar popunder solicitado solo para usuarios no premium
                 const s = document.createElement('script');
                 s.src = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
                 document.body.appendChild(s);
+                
+                setTimeout(() => {
+                    executeExport(type);
+                }, 800);
+            } else {
+                executeExport(type);
             }
-            setTimeout(() => {
-                if(type === 'copy') copyToClipboard();
-                if(type === 'pdf') generatePDF();
-            }, 1000);
+        }
+
+        function executeExport(type) {
+            if(type === 'copy') copyToClipboard();
+            if(type === 'pdf') generatePDF();
         }
 
         function copyToClipboard() {
-            if(db.length === 0) return alert("Sin datos");
+            if(db.length === 0) return alert("Sin datos registrados");
             let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*TENSIÓN RECIENTE:*\n";
             db.slice(0, 10).forEach(r => {
                 t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.momento})\n`;
