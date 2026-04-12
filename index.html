@@ -31,6 +31,10 @@
         .badge-verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
         .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Estilo para botón de borrar */
+        .delete-btn { color: #cbd5e1; transition: 0.3s; }
+        .delete-btn:hover { color: #f43f5e; }
     </style>
 </head>
 <body>
@@ -52,6 +56,21 @@
                 <p>🏥 En caso de emergencia o síntomas graves, acuda inmediatamente al centro de salud más cercano.</p>
             </div>
             <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase tracking-widest">Aceptar y Continuar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
+    <div id="confirmDeleteModal" class="modal" onclick="closeModals()">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm text-center" onclick="event.stopPropagation()">
+            <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="font-black text-xl mb-2">¿Eliminar datos?</h3>
+            <p class="text-xs text-slate-500 font-bold mb-6">Esta acción es irreversible y limpiará el almacenamiento local.</p>
+            <div class="space-y-3">
+                <button onclick="clearAllData()" class="w-full bg-rose-500 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase">Sí, borrar todo</button>
+                <button onclick="closeModals()" class="w-full bg-slate-100 text-slate-400 py-4 rounded-2xl font-black text-xs btn-tap uppercase">Cancelar</button>
+            </div>
         </div>
     </div>
 
@@ -108,7 +127,13 @@
                 <button onclick="saveHealth()" class="w-full bg-rose-500 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-rose-100 btn-tap">Guardar Registro</button>
             </div>
 
-            <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 italic">Historial y Síntomas</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic">Historial y Síntomas</h3>
+                <button onclick="confirmClear()" class="text-[9px] font-black text-slate-300 uppercase tracking-widest hover:text-rose-400 transition-colors">
+                    <i class="fas fa-eraser mr-1"></i> Limpiar Todo
+                </button>
+            </div>
+            
             <div id="unifiedTimeline" class="space-y-4 pb-20 relative">
                 <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100"></div>
             </div>
@@ -232,7 +257,6 @@
             renderAll();
             initPaypal();
             
-            // Si ya aceptó antes, no mostrar modal de bienvenida
             if(localStorage.getItem('hc_v12_tos')) {
                 document.getElementById('welcomeModal').style.display = 'none';
             }
@@ -241,7 +265,6 @@
                 const s = document.createElement('script');
                 s.src = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
                 document.body.appendChild(s);
-
                 const socialScript = document.createElement('script');
                 socialScript.type = 'text/javascript';
                 socialScript.src = '//pl29004811.highperformanceformat.com/51/93/29/51932976be964860b2f5f1902891d3bd.js';
@@ -276,9 +299,7 @@
             const peso = document.getElementById('peso').value;
             if(!sys || !dia) return;
 
-            // LÓGICA DE SEMÁFORO (MÉXICO)
             let status = { label: 'Normal', bg: 'badge-verde', color: 'text-emerald-700' };
-            
             if(sys >= 140 || dia >= 90) {
                 status = { label: 'Crisis/HTA G1', bg: 'badge-rojo', color: 'text-rose-700' };
             } else if (sys >= 130 || dia >= 85) {
@@ -289,6 +310,27 @@
             save();
             document.getElementById('sys').value = '';
             document.getElementById('dia').value = '';
+        }
+
+        // FUNCIONES DE ELIMINACIÓN
+        function deleteRecord(id, type) {
+            if(type === 'pressure') {
+                db = db.filter(x => x.id !== id);
+            } else {
+                takes = takes.filter(x => x.id !== id);
+            }
+            save();
+        }
+
+        function confirmClear() {
+            document.getElementById('confirmDeleteModal').style.display = 'flex';
+        }
+
+        function clearAllData() {
+            db = [];
+            takes = [];
+            save();
+            closeModals();
         }
 
         function addMedicine() {
@@ -327,11 +369,16 @@
                             <div class="absolute left-4 top-2 w-4 h-4 rounded-full bg-white border-4 border-slate-200 z-10"></div>
                             <div class="card py-3">
                                 <div class="flex justify-between items-start">
-                                    <div>
+                                    <div class="flex-1">
                                         <h4 class="text-xl font-black italic tracking-tighter">${item.sys}/${item.dia} <span class="text-[9px] not-italic text-slate-300">mmHg</span></h4>
                                         <p class="text-[8px] font-black text-slate-400 uppercase tracking-tighter">${dayStr} • ${timeStr} • ${item.momento} ${item.peso ? '• '+item.peso+'kg' : ''}</p>
                                     </div>
-                                    <span class="status-badge ${item.status.bg} ${item.status.color}">${item.status.label}</span>
+                                    <div class="flex flex-col items-end gap-2">
+                                        <span class="status-badge ${item.status.bg} ${item.status.color}">${item.status.label}</span>
+                                        <button onclick="deleteRecord(${item.id}, 'pressure')" class="delete-btn text-xs btn-tap p-1">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -340,10 +387,15 @@
                     timeline.innerHTML += `
                         <div class="relative pl-14 mb-4">
                             <div class="absolute left-4.5 top-2 w-3.5 h-3.5 rounded-full bg-emerald-500 z-10 border-2 border-white shadow-sm"></div>
-                            <div class="card py-3 bg-emerald-50/50 border-emerald-100">
-                                <p class="text-[8px] font-black text-emerald-600 uppercase italic mb-1">Medicina Tomada</p>
-                                <h4 class="text-xs font-black uppercase text-slate-700">${item.name}</h4>
-                                <p class="text-[8px] font-bold text-slate-400 uppercase">${dayStr} • ${timeStr}</p>
+                            <div class="card py-3 bg-emerald-50/50 border-emerald-100 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[8px] font-black text-emerald-600 uppercase italic mb-1">Medicina Tomada</p>
+                                    <h4 class="text-xs font-black uppercase text-slate-700">${item.name}</h4>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase">${dayStr} • ${timeStr}</p>
+                                </div>
+                                <button onclick="deleteRecord(${item.id}, 'med')" class="delete-btn text-xs btn-tap p-1">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -378,7 +430,10 @@
         }
 
         function openExport() { document.getElementById('exportModal').style.display = 'flex'; }
-        function closeModals() { document.getElementById('exportModal').style.display = 'none'; }
+        function closeModals() { 
+            document.getElementById('exportModal').style.display = 'none'; 
+            document.getElementById('confirmDeleteModal').style.display = 'none';
+        }
 
         function handleAction(type) {
             if(!isPro) {
