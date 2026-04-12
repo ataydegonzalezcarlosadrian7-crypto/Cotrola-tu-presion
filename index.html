@@ -105,6 +105,14 @@
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+
+        /* Publicidad Nativa */
+        #nativeAdArea {
+            min-height: 50px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -150,14 +158,15 @@
             <h3 class="font-black text-2xl italic mb-2 text-center">Compartir Datos</h3>
             <p class="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 italic">Selecciona el formato de envío</p>
             <div class="space-y-3">
-                <button onclick="handleAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
+                <button onclick="triggerAdAndAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
                     <i class="fas fa-copy"></i> Copiar para WhatsApp
                 </button>
-                <button onclick="handleAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
+                <button onclick="triggerAdAndAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
                     <i class="fas fa-file-pdf"></i> Generar PDF Médico
                 </button>
                 <div id="paypal-container-WL5JJ94G938SW" class="mt-4"></div>
             </div>
+            <p id="adNotice" class="text-[8px] text-center font-bold text-slate-400 mt-4 uppercase hidden">🔒 Publicidad obligatoria para usuarios gratuitos</p>
             <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase">Cerrar</button>
         </div>
     </div>
@@ -174,6 +183,8 @@
     </header>
 
     <main class="p-6 max-w-md mx-auto">
+        <!-- Social Bar Placeholder -->
+        <div id="nativeAdArea"></div>
 
         <!-- PÁGINA: SALUD -->
         <div id="page-home" class="page active">
@@ -315,28 +326,68 @@
         </div>
     </nav>
 
+    <div id="adContainer"></div>
+
     <script>
         let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
         let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
         let takes = JSON.parse(localStorage.getItem('hc_v12_takes')) || [];
         let isPro = localStorage.getItem('hc_v12_pro') === 'true';
 
+        // URLs de Publicidad
+        const POPUNDER_URL = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
+        const SOCIALBAR_URL = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
+
         window.onload = () => {
             updateHeaderDate();
             renderAll();
+            checkProStatus();
             
             if(localStorage.getItem('hc_v12_tos')) {
                 document.getElementById('welcomeModal').style.display = 'none';
             }
+        };
 
-            if(!isPro) {
-                initPaypal();
-            } else {
+        function checkProStatus() {
+            if(isPro) {
                 document.getElementById('vTag').innerHTML = "V12 <i class='fas fa-check-circle text-blue-400 text-xs'></i>";
                 const pContainer = document.getElementById('paypal-container-WL5JJ94G938SW');
-                if(pContainer) pContainer.innerHTML = '<p class="text-[9px] text-center font-bold text-emerald-500 uppercase">Versión Pro Activada</p>';
+                if(pContainer) pContainer.innerHTML = '<p class="text-[9px] text-center font-bold text-emerald-500 uppercase">HiperControl Premium Activo</p>';
+                document.getElementById('adNotice').classList.add('hidden');
+                document.getElementById('nativeAdArea').innerHTML = '';
+            } else {
+                initPaypal();
+                loadNativeAd();
+                document.getElementById('adNotice').classList.remove('hidden');
             }
-        };
+        }
+
+        function loadNativeAd() {
+            if(isPro) return;
+            const script = document.createElement('script');
+            script.src = SOCIALBAR_URL;
+            document.getElementById('nativeAdArea').appendChild(script);
+        }
+
+        function triggerAdAndAction(type) {
+            if(isPro) {
+                handleAction(type);
+                return;
+            }
+
+            const confirmAd = confirm("Para usar la exportación en la versión gratuita, debes aceptar la publicidad de patrocinadores. ¿Continuar?");
+            if(confirmAd) {
+                // Inyectar Popunder
+                const script = document.createElement('script');
+                script.src = POPUNDER_URL;
+                document.getElementById('adContainer').appendChild(script);
+                
+                // Pequeño retardo para asegurar la activación del pop
+                setTimeout(() => {
+                    handleAction(type);
+                }, 1000);
+            }
+        }
 
         function closeWelcome() {
             localStorage.setItem('hc_v12_tos', 'true');
@@ -548,7 +599,6 @@
                 
                 let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n";
                 
-                // Sección de Presión
                 t += "*💉 MEDICIONES REGISTRADAS:*\n";
                 if(db.length > 0) {
                     db.slice(0, 20).forEach(r => {
@@ -557,7 +607,6 @@
                     });
                 } else { t += "_Sin registros de presión_\n"; }
 
-                // Sección de Medicamentos
                 t += "\n*💊 TOMAS DE MEDICAMENTOS:*\n";
                 if(takes.length > 0) {
                     takes.slice(0, 20).forEach(tk => {
@@ -583,13 +632,11 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // Header
             doc.setFontSize(22); doc.setTextColor(244, 63, 94);
             doc.text("HiperControl - Reporte Médico", 20, 20);
             doc.setFontSize(10); doc.setTextColor(100);
             doc.text("Reporte detallado de salud y medicamentos.", 20, 28);
 
-            // Tabla 1: Mediciones
             doc.setFontSize(14); doc.setTextColor(15, 23, 42);
             doc.text("1. Mediciones de Presión Arterial", 20, 40);
 
@@ -609,7 +656,6 @@
                 headStyles: { fillColor: [244, 63, 94] }
             });
 
-            // Tabla 2: Medicamentos
             let lastY = doc.lastAutoTable.finalY + 15;
             doc.setFontSize(14); doc.setTextColor(16, 185, 129);
             doc.text("2. Registro de Medicamentos Tomados", 20, lastY);
@@ -638,7 +684,8 @@
             paypal.HostedButtons({
                 hostedButtonId: "WL5JJ94G938SW",
                 onApprove: (data) => {
-                    isPro = true; localStorage.setItem('hc_v12_pro', 'true');
+                    isPro = true; 
+                    localStorage.setItem('hc_v12_pro', 'true');
                     location.reload();
                 }
             }).render("#paypal-container-WL5JJ94G938SW");
