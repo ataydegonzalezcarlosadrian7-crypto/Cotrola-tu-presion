@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HiperControl Profesional</title>
+    <title>HiperControl V12 Ultra Pro</title>
     
-    <!-- Dependencias -->
+    <!-- Librerías de Terceros -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -25,15 +25,18 @@
         body { 
             background: #f8fafc; 
             font-family: 'Outfit', sans-serif; 
-            padding-bottom: 120px; 
+            padding-bottom: 140px; 
             overflow-x: hidden; 
             -webkit-tap-highlight-color: transparent;
         }
 
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        .page.active { display: block; animation: slideUp 0.4s ease-out; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
         .card { 
             background: white; 
@@ -41,6 +44,8 @@
             padding: 1.25rem; 
             border: 1px solid #e2e8f0; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+            position: relative;
+            overflow: hidden;
         }
 
         .input-med { 
@@ -51,263 +56,375 @@
             width: 100%; 
             font-weight: 700; 
             outline: none; 
-            transition: 0.2s; 
+            transition: 0.3s; 
         }
 
-        .input-med:focus { border-color: var(--rose); background: white; }
-        .nav-active { color: var(--rose) !important; transform: translateY(-3px); }
+        .input-med:focus { border-color: var(--rose); background: white; box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1); }
+        .nav-active { color: var(--rose) !important; transform: translateY(-5px); font-weight: 800; }
 
         .modal { 
             display: none; 
             position: fixed; 
             inset: 0; 
-            background: rgba(15, 23, 42, 0.85); 
-            backdrop-filter: blur(10px); 
+            background: rgba(15, 23, 42, 0.9); 
+            backdrop-filter: blur(8px); 
             z-index: 9999; 
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
         }
 
-        .btn-tap:active { transform: scale(0.96); }
+        .btn-tap:active { transform: scale(0.95); }
         
         .status-badge { 
-            font-size: 0.6rem; 
+            font-size: 0.65rem; 
             font-weight: 800; 
-            padding: 0.25rem 0.6rem; 
+            padding: 0.3rem 0.7rem; 
             border-radius: 2rem; 
             text-transform: uppercase; 
+            display: inline-block;
+            margin-bottom: 0.5rem;
         }
 
         .badge-verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
         .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
-        #socialBarContainer { 
-            min-height: 60px; 
-            width: 100%;
-            margin-bottom: 1rem;
+        .sos-grid-btn {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            overflow: hidden;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            gap: 0.5rem;
+            transition: 0.2s;
         }
 
-        .sos-btn { 
-            display: flex; 
-            align-items: center; 
-            gap: 1rem; 
-            padding: 1.2rem; 
-            background: white; 
-            border-radius: 1.5rem; 
-            border: 1px solid #e2e8f0;
-            text-decoration: none; 
-            color: inherit; 
-            margin-bottom: 0.8rem; 
+        .ad-placeholder {
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            margin: 1rem 0;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
         }
+
+        #socialBarContainer { min-height: 50px; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- BIENVENIDA / TOS -->
+    <!-- MODAL DE BIENVENIDA -->
     <div id="welcomeModal" class="modal" style="display: flex;">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col max-h-[85vh]">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col max-h-[90vh]">
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                <div class="w-20 h-20 bg-rose-500 text-white rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-xl shadow-rose-200">
                     <i class="fas fa-heart-pulse"></i>
                 </div>
-                <h3 class="font-black text-2xl italic">HiperControl</h3>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Protocolo Médico V12 Ultra</p>
+                <h3 class="font-black text-2xl italic text-slate-900">HiperControl V12</h3>
+                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Tecnología de Monitoreo Pro</p>
             </div>
-            <div class="overflow-y-auto pr-2 space-y-4 text-[11px] font-medium text-slate-500 leading-relaxed text-justify mb-6">
-                <p>📍 <strong>AVISO MÉDICO:</strong> Esta app es una bitácora de registro. No mide la presión por sí misma; requiere un baumanómetro externo.</p>
-                <p>🔒 <strong>PRIVACIDAD:</strong> Sus datos se guardan localmente. Nosotros no tenemos acceso a su información de salud.</p>
+            <div class="overflow-y-auto pr-2 space-y-4 text-[12px] font-medium text-slate-600 leading-relaxed text-justify mb-6">
+                <p>⚡ <strong>IMPORTANTE:</strong> Esta aplicación es una herramienta de registro y análisis. No realiza mediciones de presión arterial directamente; requiere el uso de un baumanómetro certificado.</p>
+                <p>🔒 <strong>DATOS SEGUROS:</strong> Su información es privada y se almacena únicamente en la memoria local de su dispositivo.</p>
+                <p>📋 <strong>INSTRUCCIONES:</strong> Registre sus tomas de presión y medicamentos diariamente para generar un reporte médico válido para su especialista.</p>
             </div>
-            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase">Entendido</button>
+            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm btn-tap uppercase tracking-widest">Comenzar Protocolo</button>
         </div>
     </div>
 
-    <!-- MODAL EXPORTAR / PAYPAL -->
+    <!-- MODAL EXPORTAR / PRO -->
     <div id="exportModal" class="modal" onclick="closeModals()">
         <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm" onclick="event.stopPropagation()">
-            <h3 class="font-black text-2xl italic mb-4 text-center">Compartir Reporte</h3>
+            <div class="text-center mb-6">
+                <h3 class="font-black text-2xl italic text-slate-900">Generar Reporte</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase italic">Exportación de Datos Médicos</p>
+            </div>
+            
             <div class="space-y-3">
-                <button onclick="triggerAdAndAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase tracking-widest">
-                    <i class="fas fa-copy"></i> WhatsApp / Portapapeles
+                <button onclick="triggerAdAndAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-emerald-100">
+                    <i class="fas fa-whatsapp text-lg"></i> Enviar a WhatsApp
                 </button>
-                <button onclick="triggerAdAndAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase tracking-widest">
-                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                <button onclick="triggerAdAndAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-slate-200">
+                    <i class="fas fa-file-pdf text-lg"></i> Descargar PDF Pro
                 </button>
                 
-                <div id="paypalArea" class="pt-6 mt-4 border-t border-slate-100 text-center">
-                    <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-tighter italic">¿Cansado de anuncios? Desbloquea HiperControl Pro</p>
+                <div id="paypalArea" class="pt-6 mt-6 border-t border-slate-100 text-center">
+                    <div class="bg-amber-50 p-4 rounded-2xl mb-4 border border-amber-100">
+                        <p class="text-[10px] font-black text-amber-600 uppercase mb-1"><i class="fas fa-crown mr-1"></i> HiperControl Pro</p>
+                        <p class="text-[11px] font-bold text-slate-500 italic">Elimina anuncios y exporta sin esperas por solo $50 MXN</p>
+                    </div>
                     <div id="paypal-container-WL5JJ94G938SW"></div>
                 </div>
             </div>
-            <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase">Volver</button>
+            <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase hover:text-rose-500 transition-colors">Cancelar</button>
         </div>
     </div>
 
-    <!-- HEADER -->
-    <header class="sticky top-0 bg-white/80 backdrop-blur-xl z-[100] px-6 pt-10 pb-4 border-b border-slate-100 flex justify-between items-center">
+    <!-- HEADER UI -->
+    <header class="sticky top-0 bg-white/90 backdrop-blur-xl z-[100] px-6 pt-12 pb-5 border-b border-slate-100 flex justify-between items-end">
         <div>
-            <span id="headerDate" class="text-[9px] font-black text-rose-500 uppercase tracking-widest italic">-- -- --</span>
-            <h1 class="text-2xl font-black italic tracking-tighter">HiperControl <span id="vTag" class="text-rose-500">V12</span></h1>
+            <span id="headerDate" class="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] italic">-- -- --</span>
+            <h1 class="text-3xl font-black italic tracking-tighter text-slate-900 leading-none mt-1">HiperControl <span id="vTag" class="text-rose-500">V12</span></h1>
         </div>
-        <button onclick="openExport()" class="w-11 h-11 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg btn-tap">
-            <i class="fas fa-share-nodes"></i>
+        <button onclick="openExport()" class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl btn-tap">
+            <i class="fas fa-share-nodes text-lg"></i>
         </button>
     </header>
 
+    <!-- NAVEGACIÓN -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 p-6 pb-10 z-[200] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div class="max-w-md mx-auto flex justify-between items-center text-[9px] font-black uppercase text-slate-300">
+            <button onclick="tab('home', this)" class="flex flex-col items-center gap-2 nav-active transition-all"><i class="fas fa-heartbeat text-2xl"></i>Inicio</button>
+            <button onclick="tab('meds', this)" class="flex flex-col items-center gap-2 transition-all"><i class="fas fa-pills text-2xl"></i>Meds</button>
+            <button onclick="tab('guide', this)" class="flex flex-col items-center gap-2 transition-all"><i class="fas fa-book-medical text-2xl"></i>Guía</button>
+            <button onclick="tab('risk', this)" class="flex flex-col items-center gap-2 transition-all"><i class="fas fa-chart-line text-2xl"></i>Riesgo</button>
+            <button onclick="tab('sos', this)" class="flex flex-col items-center gap-2 transition-all text-rose-300"><i class="fas fa-phone-alt text-2xl"></i>SOS</button>
+        </div>
+    </nav>
+
     <main class="p-6 max-w-md mx-auto">
-        <!-- ANUNCIO SOCIAL BAR -->
+        
         <div id="socialBarContainer"></div>
 
-        <!-- PÁGINA: HOME (SALUD) -->
+        <!-- PÁGINA: HOME -->
         <div id="page-home" class="page active">
-            <div class="card mb-6 border-b-8 border-rose-500">
-                <div class="flex gap-4 mb-4">
+            <div class="card mb-8 border-b-[10px] border-rose-500">
+                <div class="flex gap-4 mb-5">
                     <div class="flex-1">
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block">Sistólica (Alta)</label>
-                        <input type="number" id="sys" placeholder="120" class="input-med text-2xl text-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Sistólica (Alta)</label>
+                        <input type="number" id="sys" placeholder="120" class="input-med text-3xl text-center">
                     </div>
                     <div class="flex-1">
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block">Diastólica (Baja)</label>
-                        <input type="number" id="dia" placeholder="80" class="input-med text-2xl text-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Diastólica (Baja)</label>
+                        <input type="number" id="dia" placeholder="80" class="input-med text-3xl text-center">
                     </div>
                 </div>
-                <div class="flex gap-3 mb-4">
-                    <select id="momento" class="input-med text-xs flex-1">
-                        <option value="Ayunas">🌅 Ayunas</option>
-                        <option value="Mañana">☀️ Mañana</option>
-                        <option value="Tarde">🌆 Tarde</option>
-                        <option value="Noche">🌙 Noche</option>
-                        <option value="Crisis">🚨 Crisis/Dolor</option>
-                    </select>
-                    <input type="number" id="peso" placeholder="kg" class="input-med text-xs w-20 text-center">
+                <div class="flex gap-4 mb-5">
+                    <div class="flex-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Momento</label>
+                        <select id="momento" class="input-med text-xs">
+                            <option value="Ayunas">🌅 Ayunas</option>
+                            <option value="Post-Desayuno">🍳 Post-Desayuno</option>
+                            <option value="Tarde">🌆 Tarde</option>
+                            <option value="Noche">🌙 Noche</option>
+                            <option value="Antes de dormir">🛏️ Antes de dormir</option>
+                            <option value="Crisis">⚠️ Crisis / Dolor</option>
+                        </select>
+                    </div>
+                    <div class="w-24">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Peso</label>
+                        <input type="number" id="peso" placeholder="kg" class="input-med text-center text-sm">
+                    </div>
                 </div>
-                <button onclick="saveHealth()" class="w-full bg-rose-500 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg btn-tap">Guardar Medición</button>
+                <button onclick="saveHealth()" class="w-full bg-rose-500 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-rose-200 btn-tap">Guardar Medición</button>
             </div>
             
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase italic">Bitácora Unificada</h3>
-                <button onclick="confirmClear()" class="text-[9px] font-black text-slate-200 uppercase">Limpiar Todo</button>
+            <div class="flex justify-between items-center mb-6 px-2">
+                <h3 class="text-[11px] font-black text-slate-900 uppercase italic flex items-center gap-2">
+                    <i class="fas fa-history text-rose-500"></i> Historial Médico Completo
+                </h3>
+                <button onclick="confirmClear()" class="text-[10px] font-black text-slate-300 uppercase hover:text-rose-500">Limpiar</button>
             </div>
+
+            <!-- Aquí se mezclan mediciones y tomas de medicación -->
             <div id="unifiedTimeline" class="space-y-4"></div>
         </div>
 
         <!-- PÁGINA: MEDICAMENTOS -->
         <div id="page-meds" class="page">
-            <h2 class="text-2xl font-black italic mb-2 tracking-tighter">Recetario</h2>
-            <div class="card mb-6 border-b-8 border-slate-900">
-                <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block italic">Nombre y Dosis</label>
-                <input type="text" id="mName" placeholder="Enalapril 10mg..." class="input-med mb-3">
-                <div class="flex gap-2">
-                    <div class="flex-1">
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block italic">Próxima Toma</label>
-                        <input type="time" id="mTime" class="input-med">
+            <h2 class="text-2xl font-black italic mb-2 text-slate-900">Recetario Digital</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Administración de Tratamiento</p>
+            
+            <div class="card mb-8 border-b-[10px] border-slate-900">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Fármaco y Miligramos</label>
+                        <input type="text" id="mName" placeholder="Ej: Losartán 50mg" class="input-med">
                     </div>
-                    <button onclick="addMedicine()" class="bg-slate-900 text-white px-6 rounded-xl font-black text-[10px] uppercase btn-tap mt-5">Añadir</button>
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Horario Programado</label>
+                            <input type="time" id="mTime" class="input-med">
+                        </div>
+                        <button onclick="addMedicine()" class="bg-slate-900 text-white px-8 rounded-2xl font-black text-[10px] uppercase btn-tap mt-7 shadow-lg shadow-slate-200">Añadir</button>
+                    </div>
                 </div>
             </div>
-            <div id="medsList" class="space-y-3"></div>
+
+            <div id="medsList" class="space-y-4 mb-8"></div>
+
+            <!-- ANUNCIO IFRAME (Medicacion) -->
+            <div id="ad-meds" class="flex justify-center py-4 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '6e5a453a36b12cb65c0dbf1ddaed2be1',
+                        'format' : 'iframe',
+                        'height' : 300,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="https://www.highperformanceformat.com/6e5a453a36b12cb65c0dbf1ddaed2be1/invoke.js"></script>
+            </div>
         </div>
 
-        <!-- PÁGINA: GUÍA Y SEMÁFORO -->
+        <!-- PÁGINA: GUÍA MÉDICA -->
         <div id="page-guide" class="page">
-            <h2 class="text-2xl font-black italic mb-6 tracking-tighter">Centro de Guía</h2>
+            <h2 class="text-2xl font-black italic mb-2 text-slate-900">Guía de Control</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Estándares Médicos AHA/ESC</p>
+            
             <div class="space-y-4">
-                <div class="card border-l-8 border-emerald-500">
-                    <h4 class="font-black italic text-sm mb-1 uppercase text-emerald-600">Normal (Óptima)</h4>
-                    <p class="text-[11px] text-slate-500 font-bold uppercase">Sistólica < 120 y Diastólica < 80. Mantenga su estilo de vida saludable.</p>
+                <div class="card border-l-[12px] border-emerald-500">
+                    <h4 class="font-black italic text-emerald-600 uppercase text-sm mb-1">Óptima (Saludable)</h4>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase leading-relaxed">Sistólica < 120 mmHg <br> Diastólica < 80 mmHg</p>
+                    <div class="mt-2 text-[10px] text-emerald-800 bg-emerald-50 p-2 rounded-lg font-bold">RECOMENDACIÓN: Mantenga dieta baja en sodio y ejercicio diario.</div>
                 </div>
-                <div class="card border-l-8 border-amber-500">
-                    <h4 class="font-black italic text-sm mb-1 uppercase text-amber-600">Elevada</h4>
-                    <p class="text-[11px] text-slate-500 font-bold uppercase">Sistólica 120-129. Momento de reducir sodio y estrés.</p>
+                <div class="card border-l-[12px] border-amber-500">
+                    <h4 class="font-black italic text-amber-600 uppercase text-sm mb-1">Presión Elevada</h4>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase leading-relaxed">Sistólica 120-129 mmHg <br> Diastólica < 80 mmHg</p>
+                    <div class="mt-2 text-[10px] text-amber-800 bg-amber-50 p-2 rounded-lg font-bold">RIESGO: Usted tiene mayor probabilidad de desarrollar hipertensión si no actúa ahora.</div>
                 </div>
-                <div class="card border-l-8 border-rose-500">
-                    <h4 class="font-black italic text-sm mb-1 uppercase text-rose-600">Hipertensión G1/G2</h4>
-                    <p class="text-[11px] text-slate-500 font-bold uppercase">Más de 130/80. Requiere monitoreo médico y posible ajuste de dosis.</p>
+                <div class="card border-l-[12px] border-rose-500">
+                    <h4 class="font-black italic text-rose-600 uppercase text-sm mb-1">Hipertensión Grado 1/2</h4>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase leading-relaxed">Sistólica 130-140+ mmHg <br> Diastólica 80-90+ mmHg</p>
+                    <div class="mt-2 text-[10px] text-rose-800 bg-rose-50 p-2 rounded-lg font-bold">ALERTA: Contacte a su médico para iniciar o ajustar tratamiento farmacológico.</div>
                 </div>
-                <div class="card bg-slate-900 text-white p-6">
-                    <h4 class="font-black italic text-lg mb-4 text-rose-400">🍎 Recomendación DASH</h4>
-                    <ul class="text-[10px] font-bold uppercase space-y-2 opacity-90">
-                        <li>• <span class="text-rose-300">SAL:</span> Evite embutidos y enlatados.</li>
-                        <li>• <span class="text-rose-300">POTASIO:</span> Consuma plátano y verduras verdes.</li>
-                        <li>• <span class="text-rose-300">PESO:</span> Mantenga su IMC bajo 25.</li>
-                    </ul>
+
+                <div class="card bg-slate-900 text-white p-6 mt-6">
+                    <h4 class="font-black italic text-xl mb-4 text-rose-400 italic flex items-center gap-2">
+                        <i class="fas fa-apple-whole"></i> Protocolo DASH
+                    </h4>
+                    <div class="space-y-4 text-[11px] font-bold uppercase tracking-tight opacity-90">
+                        <div class="flex gap-3">
+                            <span class="text-rose-400">01</span>
+                            <p>Elimine por completo el salero de la mesa y evite alimentos procesados.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="text-rose-400">02</span>
+                            <p>Aumente consumo de frutas, vegetales y lácteos bajos en grasa.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="text-rose-400">03</span>
+                            <p>Realice al menos 30 minutos de actividad aeróbica 5 veces por semana.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- PÁGINA: RIESGO CARDIOVASCULAR -->
+        <!-- PÁGINA: RIESGO CV -->
         <div id="page-risk" class="page">
-            <h2 class="text-2xl font-black italic mb-2 tracking-tighter">Riesgo CV</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Calculadora de Factores</p>
-            <div class="card space-y-4">
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span class="text-xs font-black uppercase italic"><i class="fas fa-smoking mr-2"></i>Tabaquismo</span>
-                    <input type="checkbox" id="risk-smoke" class="w-6 h-6 accent-rose-500">
+            <h2 class="text-2xl font-black italic mb-2 text-slate-900">Cálculo de Riesgo</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Factores de Supervivencia</p>
+            
+            <div class="card space-y-4 mb-8">
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-smoking text-slate-400"></i>
+                        <span class="text-xs font-black uppercase italic text-slate-600">Fumador Activo</span>
+                    </div>
+                    <input type="checkbox" id="risk-smoke" class="w-7 h-7 accent-rose-500">
                 </div>
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span class="text-xs font-black uppercase italic"><i class="fas fa-droplet mr-2"></i>Diabetes</span>
-                    <input type="checkbox" id="risk-db" class="w-6 h-6 accent-rose-500">
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-droplet text-slate-400"></i>
+                        <span class="text-xs font-black uppercase italic text-slate-600">Diabetes / Glucosa Alta</span>
+                    </div>
+                    <input type="checkbox" id="risk-db" class="w-7 h-7 accent-rose-500">
                 </div>
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <span class="text-xs font-black uppercase italic"><i class="fas fa-person-running mr-2"></i>Sedentarismo</span>
-                    <input type="checkbox" id="risk-sed" class="w-6 h-6 accent-rose-500">
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-person-running text-slate-400"></i>
+                        <span class="text-xs font-black uppercase italic text-slate-600">Sin Actividad Física</span>
+                    </div>
+                    <input type="checkbox" id="risk-sed" class="w-7 h-7 accent-rose-500">
                 </div>
-                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs uppercase btn-tap">Evaluar Riesgo</button>
-                <div id="riskResult" class="hidden p-6 rounded-2xl text-center font-black italic"></div>
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-weight-scale text-slate-400"></i>
+                        <span class="text-xs font-black uppercase italic text-slate-600">Sobrepeso / Obesidad</span>
+                    </div>
+                    <input type="checkbox" id="risk-ob" class="w-7 h-7 accent-rose-500">
+                </div>
+                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-xs uppercase btn-tap shadow-lg shadow-slate-200">Evaluar Estado Cardiovascular</button>
+                <div id="riskResult" class="hidden animate-fadeIn"></div>
+            </div>
+
+            <!-- NATIVE BANNER (Riesgo CV) -->
+            <div id="ad-risk" class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-4 overflow-hidden min-h-[150px]">
+                <script async="async" data-cfasync="false" src="https://pl28961994.profitablecpmratenetwork.com/04e776b88f82609a4b44e12d4eebd8e9/invoke.js"></script>
+                <div id="container-04e776b88f82609a4b44e12d4eebd8e9"></div>
             </div>
         </div>
 
         <!-- PÁGINA: SOS -->
         <div id="page-sos" class="page">
-            <h2 class="text-2xl font-black italic text-rose-600 mb-6 uppercase tracking-tighter">Centro SOS</h2>
-            <div class="space-y-4">
-                <a href="tel:911" class="sos-btn border-rose-500 bg-rose-50 animate-pulse">
-                    <div class="w-12 h-12 bg-rose-500 text-white rounded-xl flex items-center justify-center text-xl"><i class="fas fa-ambulance"></i></div>
-                    <div><p class="font-black text-rose-600 italic">911 EMERGENCIAS</p><p class="text-[9px] font-bold uppercase tracking-widest">México / General</p></div>
+            <h2 class="text-2xl font-black italic text-rose-600 mb-2 uppercase tracking-tighter">Emergencias</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-8 italic tracking-widest">Protocolo de Atención Inmediata</p>
+            
+            <div class="grid grid-cols-1 gap-4">
+                <a href="tel:911" class="sos-grid-btn bg-rose-500 text-white shadow-xl shadow-rose-200 animate-pulse">
+                    <i class="fas fa-phone-alt text-3xl mb-2"></i>
+                    <p class="font-black text-lg italic">911</p>
+                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-80">Atención Ciudadana</p>
                 </a>
-                <a href="tel:5556581111" class="sos-btn">
-                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl"><i class="fas fa-info-circle"></i></div>
-                    <div><p class="font-black text-blue-700 italic">LOCATEL</p><p class="text-[9px] font-bold uppercase">Orientación Médica</p></div>
-                </a>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="tel:5556581111" class="sos-grid-btn bg-white border-2 border-slate-100 text-slate-900">
+                        <i class="fas fa-info-circle text-blue-500 text-2xl mb-1"></i>
+                        <p class="font-black italic text-sm">LOCATEL</p>
+                        <p class="text-[8px] font-bold uppercase text-slate-400">Orientación</p>
+                    </a>
+                    <a href="tel:5553951111" class="sos-grid-btn bg-white border-2 border-slate-100 text-slate-900">
+                        <i class="fas fa-briefcase-medical text-rose-500 text-2xl mb-1"></i>
+                        <p class="font-black italic text-sm">CRUZ ROJA</p>
+                        <p class="text-[8px] font-bold uppercase text-slate-400">Paramédicos</p>
+                    </a>
+                </div>
+
+                <div class="card bg-rose-50 border-rose-100 mt-4 p-6">
+                    <h4 class="font-black italic text-rose-600 uppercase text-xs mb-3 flex items-center gap-2">
+                        <i class="fas fa-triangle-exclamation"></i> Cuándo llamar al 911:
+                    </h4>
+                    <ul class="text-[10px] font-bold text-rose-800 space-y-3 uppercase leading-tight">
+                        <li>🚨 Dolor opresivo en el pecho que se irradia al brazo.</li>
+                        <li>🚨 Dificultad súbita para hablar o parálisis facial.</li>
+                        <li>🚨 Visión borrosa extrema con dolor de cabeza intenso.</li>
+                        <li>🚨 Presión Sistólica mayor a 180 mmHg en reposo.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- NAVEGACIÓN -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-5 pb-8 z-[200] shadow-2xl">
-        <div class="max-w-md mx-auto flex justify-between items-center text-[8px] font-black uppercase text-slate-300">
-            <button onclick="tab('home', this)" class="flex flex-col items-center gap-2 nav-active flex-1"><i class="fas fa-heartbeat text-xl"></i>Salud</button>
-            <button onclick="tab('meds', this)" class="flex flex-col items-center gap-2 flex-1"><i class="fas fa-pills text-xl"></i>Meds</button>
-            <button onclick="tab('guide', this)" class="flex flex-col items-center gap-2 flex-1"><i class="fas fa-book-medical text-xl"></i>Guía</button>
-            <button onclick="tab('risk', this)" class="flex flex-col items-center gap-2 flex-1"><i class="fas fa-chart-line text-xl"></i>Riesgo</button>
-            <button onclick="tab('sos', this)" class="flex flex-col items-center gap-2 flex-1 text-slate-400"><i class="fas fa-truck-medical text-xl"></i>SOS</button>
-        </div>
-    </nav>
-
-    <!-- MODAL CONFIRMAR BORRADO -->
+    <!-- MODALES DE APOYO -->
     <div id="confirmDeleteModal" class="modal" onclick="closeModals()">
         <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm text-center">
-            <h3 class="font-black text-xl mb-6 italic uppercase">¿Borrar Historial?</h3>
-            <div class="flex gap-3">
-                <button onclick="clearAllData()" class="flex-1 bg-rose-500 text-white py-4 rounded-xl font-black uppercase text-xs btn-tap">Sí</button>
-                <button onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-400 py-4 rounded-xl font-black uppercase text-xs btn-tap">No</button>
+            <h3 class="font-black text-xl mb-6 italic text-slate-900 uppercase">¿Restablecer Bitácora?</h3>
+            <p class="text-xs font-bold text-slate-400 uppercase mb-6 italic">Esta acción borrará todas sus mediciones y medicamentos de forma permanente.</p>
+            <div class="flex gap-4">
+                <button onclick="clearAllData()" class="flex-1 bg-rose-500 text-white py-5 rounded-2xl font-black uppercase text-xs btn-tap shadow-lg shadow-rose-100">Borrar</button>
+                <button onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-400 py-5 rounded-2xl font-black uppercase text-xs btn-tap">No</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ESTADO DE LA APP
+        // ESTADO GLOBAL
         let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
         let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
         let takes = JSON.parse(localStorage.getItem('hc_v12_takes')) || [];
         let isPro = localStorage.getItem('hc_v12_pro') === 'true';
 
-        // ANUNCIOS
         const SOCIAL_BAR_SRC = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
         const POP_UNDER_SRC = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
 
@@ -320,57 +437,96 @@
 
         function checkProStatus() {
             if(isPro) {
-                document.getElementById('vTag').innerHTML = "V12 <i class='fas fa-crown text-amber-500'></i>";
+                document.getElementById('vTag').innerHTML = "PRO <i class='fas fa-crown text-amber-500'></i>";
                 document.getElementById('paypalArea').classList.add('hidden');
                 document.getElementById('socialBarContainer').style.display = 'none';
+                document.getElementById('ad-meds').style.display = 'none';
+                document.getElementById('ad-risk').style.display = 'none';
             } else {
                 initPaypal();
-                forceSocialBar();
+                loadSocialBar();
             }
         }
 
-        function forceSocialBar() {
+        function loadSocialBar() {
             if(isPro) return;
-            const container = document.getElementById('socialBarContainer');
             const script = document.createElement('script');
-            script.type = 'text/javascript';
             script.src = SOCIAL_BAR_SRC;
             script.async = true;
-            container.appendChild(script);
+            document.getElementById('socialBarContainer').appendChild(script);
         }
 
+        // FLUJO DE EXPORTACIÓN CON POPUNDER
         function triggerAdAndAction(type) {
             if(isPro) {
                 handleAction(type);
                 return;
             }
-            if(confirm("Esta función gratuita incluye un anuncio patrocinado. ¿Desea continuar?")) {
+            
+            const confirmAd = confirm("Esta función es gratuita gracias a anunciantes. Se abrirá publicidad externa y después podrá descargar su archivo. ¿Acepta?");
+            
+            if(confirmAd) {
+                // Inyectar Popunder
                 const popScript = document.createElement('script');
                 popScript.src = POP_UNDER_SRC;
                 document.body.appendChild(popScript);
-                setTimeout(() => handleAction(type), 800);
+                
+                // Ejecutar después de que el navegador procese el popunder
+                setTimeout(() => handleAction(type), 1500);
             }
         }
 
         function handleAction(type) {
             if(type === 'copy') {
-                let text = "*📋 REPORTE HIPERCONTROL*\n\n";
-                db.slice(0, 15).forEach(r => text += `${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia}* | ${r.momento}\n`);
+                let text = "*📋 REPORTE HIPERCONTROL V12 PRO*\n";
+                text += "------------------------------\n\n";
+                text += "*REGISTROS DE PRESIÓN:*\n";
+                db.slice(0, 20).forEach(r => {
+                    text += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia}* | ${r.momento} ${r.peso ? '| '+r.peso+'kg' : ''}\n`;
+                });
+                text += "\n*TOMAS DE MEDICAMENTOS:*\n";
+                takes.slice(0, 10).forEach(t => {
+                    text += `• ${new Date(t.date).toLocaleDateString()} | ${new Date(t.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} | ${t.name}\n`;
+                });
+                
                 const el = document.createElement('textarea');
                 el.value = text; document.body.appendChild(el);
                 el.select(); document.execCommand('copy');
                 document.body.removeChild(el);
-                alert("Reporte copiado con éxito.");
+                alert("¡Reporte completo copiado al portapapeles!");
                 closeModals();
             } else if(type === 'pdf') {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
+                
+                doc.setFont("helvetica", "bold");
                 doc.setTextColor(244, 63, 94);
-                doc.setFontSize(22);
-                doc.text("Reporte HiperControl V12", 14, 20);
-                const rows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.momento, r.status.label, r.peso ? r.peso+'kg' : '-']);
-                doc.autoTable({ head: [['Fecha', 'Presión', 'Momento', 'Estado', 'Peso']], body: rows, startY: 30, theme: 'grid' });
-                doc.save("Reporte_HiperControl.pdf");
+                doc.text("REPORTE MÉDICO: HIPERCONTROL V12", 14, 20);
+                
+                // Tabla de Presión
+                doc.setTextColor(15, 23, 42);
+                doc.setFontSize(12);
+                doc.text("HISTORIAL DE PRESIÓN ARTERIAL", 14, 30);
+                const pressureRows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.momento, r.status.label, r.peso ? r.peso+'kg' : '-']);
+                doc.autoTable({ 
+                    head: [['Fecha', 'Presión', 'Momento', 'Estado', 'Peso']], 
+                    body: pressureRows, 
+                    startY: 35,
+                    headStyles: { fillColor: [15, 23, 42] }
+                });
+
+                // Tabla de Medicación
+                const lastY = doc.lastAutoTable.finalY + 15;
+                doc.text("HISTORIAL DE TOMA DE MEDICAMENTOS", 14, lastY);
+                const medsRows = takes.map(t => [new Date(t.date).toLocaleDateString(), new Date(t.date).toLocaleTimeString(), t.name]);
+                doc.autoTable({ 
+                    head: [['Fecha', 'Hora', 'Medicamento']], 
+                    body: medsRows, 
+                    startY: lastY + 5,
+                    headStyles: { fillColor: [16, 185, 129] }
+                });
+
+                doc.save(`HiperControl_Reporte_${Date.now()}.pdf`);
                 closeModals();
             }
         }
@@ -381,9 +537,10 @@
             const peso = document.getElementById('peso').value;
             if(!sys || !dia) return;
 
-            let status = { label: 'Normal', bg: 'badge-verde' };
-            if(sys >= 140 || dia >= 90) status = { label: 'Crisis', bg: 'badge-rojo' };
-            else if(sys >= 130 || dia >= 85) status = { label: 'Elevada', bg: 'badge-amarillo' };
+            let status = { label: 'Óptima', bg: 'badge-verde' };
+            if(sys >= 140 || dia >= 90) status = { label: 'Hipertensión G2', bg: 'badge-rojo' };
+            else if(sys >= 130 || dia >= 85) status = { label: 'Hipertensión G1', bg: 'badge-rojo' };
+            else if(sys >= 120 || dia >= 80) status = { label: 'Elevada', bg: 'badge-amarillo' };
 
             db.unshift({ id: Date.now(), type: 'pressure', sys, dia, peso, momento: document.getElementById('momento').value, date: Date.now(), status });
             save();
@@ -402,21 +559,37 @@
         function logTake(name) {
             takes.unshift({ id: Date.now(), type: 'med', name, date: Date.now() });
             save();
-            alert("Toma de " + name + " registrada.");
+            // Efecto visual simple
+            const feedback = document.createElement('div');
+            feedback.className = "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 text-white p-6 rounded-3xl z-[500] font-black italic uppercase text-xs";
+            feedback.innerHTML = `<i class="fas fa-check-circle text-emerald-400 mr-2"></i> Toma de ${name} Registrada`;
+            document.body.appendChild(feedback);
+            setTimeout(() => feedback.remove(), 1500);
         }
 
         function calcRisk() {
             const s = document.getElementById('risk-smoke').checked;
             const d = document.getElementById('risk-db').checked;
             const se = document.getElementById('risk-sed').checked;
-            let count = (s?1:0)+(d?1:0)+(se?1:0);
-            let lvl = "Bajo", cls = "bg-emerald-100 text-emerald-700";
-            if(count >= 3) { lvl = "Muy Alto"; cls = "bg-rose-600 text-white"; }
-            else if(count === 2) { lvl = "Alto"; cls = "bg-rose-100 text-rose-700"; }
-            else if(count === 1) { lvl = "Moderado"; cls = "bg-amber-100 text-amber-700"; }
+            const ob = document.getElementById('risk-ob').checked;
+            
+            let score = (s?1:0)+(d?1:0)+(se?1:0)+(ob?1:0);
+            let lvl = "Mínimo", cls = "bg-emerald-500 text-white";
+            let msg = "Su perfil cardiovascular es saludable. Mantenga el ejercicio.";
+
+            if(score >= 4) { lvl = "Crítico"; cls = "bg-rose-600 text-white"; msg = "¡ALTA PRIORIDAD! Múltiples factores de riesgo detectados. Agende cita médica hoy."; }
+            else if(score === 3) { lvl = "Muy Alto"; cls = "bg-rose-500 text-white"; msg = "Riesgo coronario elevado. Requiere cambios urgentes en dieta."; }
+            else if(score === 2) { lvl = "Moderado"; cls = "bg-amber-500 text-white"; msg = "Vigilancia necesaria. Controle su peso y glucosa."; }
+            else if(score === 1) { lvl = "Leve"; cls = "bg-emerald-400 text-white"; msg = "Factor aislado detectado. No lo ignore."; }
+
             const res = document.getElementById('riskResult');
-            res.innerHTML = `<p class="uppercase text-[9px] opacity-70 mb-1">Resultado de Score</p><p class="text-2xl uppercase italic">${lvl}</p>`;
-            res.className = `p-8 rounded-2xl text-center font-black italic mt-4 ${cls}`;
+            res.innerHTML = `
+                <div class="p-8 rounded-3xl text-center font-black italic mt-4 ${cls}">
+                    <p class="uppercase text-[9px] opacity-70 mb-1 tracking-widest">Estado de Riesgo Cardiovascular</p>
+                    <p class="text-3xl uppercase italic mb-3">${lvl}</p>
+                    <p class="text-[10px] font-bold opacity-90 leading-tight uppercase">${msg}</p>
+                </div>
+            `;
             res.classList.remove('hidden');
         }
 
@@ -435,37 +608,59 @@
         }
 
         function renderAll() {
-            const combined = [...db, ...takes].sort((a,b) => b.date - a.date).slice(0, 15);
+            // Unificamos historial para la ventana principal
+            const combined = [...db, ...takes].sort((a,b) => b.date - a.date);
             const tl = document.getElementById('unifiedTimeline');
-            tl.innerHTML = combined.map(item => {
-                if(item.type === 'pressure') {
-                    return `
-                        <div class="card flex justify-between items-center border-l-8 border-rose-500">
-                            <div>
-                                <span class="status-badge ${item.status.bg}">${item.status.label}</span>
-                                <p class="text-2xl font-black italic">${item.sys}/${item.dia}</p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase italic">${new Date(item.date).toLocaleDateString()} • ${item.momento} ${item.peso ? '• '+item.peso+'kg' : ''}</p>
-                            </div>
-                            <button onclick="deleteItem(${item.id}, 'db')" class="text-slate-200"><i class="fas fa-times-circle text-xl"></i></button>
-                        </div>`;
-                } else {
-                    return `
-                        <div class="card bg-emerald-50 border-emerald-100 flex justify-between items-center py-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs"><i class="fas fa-check"></i></div>
-                                <div><p class="text-[9px] font-black text-emerald-700 uppercase italic">Toma Registrada</p><p class="text-xs font-black italic">${item.name}</p></div>
-                            </div>
-                            <button onclick="deleteItem(${item.id}, 'takes')" class="text-emerald-200"><i class="fas fa-trash"></i></button>
-                        </div>`;
-                }
-            }).join('');
+            
+            if(combined.length === 0) {
+                tl.innerHTML = `<div class="p-10 text-center opacity-20"><i class="fas fa-folder-open text-4xl mb-2"></i><p class="text-[10px] font-black uppercase">Sin registros</p></div>`;
+            } else {
+                tl.innerHTML = combined.map(item => {
+                    if(item.type === 'pressure') {
+                        return `
+                            <div class="card flex justify-between items-center border-l-8 border-rose-500 animate-fadeIn">
+                                <div class="flex-1">
+                                    <span class="status-badge ${item.status.bg}">${item.status.label}</span>
+                                    <div class="flex items-baseline gap-2">
+                                        <p class="text-3xl font-black italic text-slate-900">${item.sys}/${item.dia}</p>
+                                        <span class="text-[10px] font-bold text-slate-300 italic">mmHg</span>
+                                    </div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase italic mt-1">
+                                        <i class="far fa-calendar mr-1"></i> ${new Date(item.date).toLocaleDateString()} • ${item.momento} ${item.peso ? '• <i class="fas fa-weight-scale ml-1"></i> '+item.peso+'kg' : ''}
+                                    </p>
+                                </div>
+                                <button onclick="deleteItem(${item.id}, 'db')" class="text-slate-200 hover:text-rose-500 transition-colors"><i class="fas fa-times-circle text-2xl"></i></button>
+                            </div>`;
+                    } else {
+                        return `
+                            <div class="card bg-emerald-50 border-emerald-100 flex justify-between items-center py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-100"><i class="fas fa-check text-sm"></i></div>
+                                    <div>
+                                        <p class="text-[10px] font-black text-emerald-600 uppercase italic tracking-tighter">Toma de Medicamento</p>
+                                        <p class="text-sm font-black italic text-slate-900 leading-none mt-1">${item.name}</p>
+                                        <p class="text-[9px] font-bold text-emerald-400 uppercase mt-1 italic">${new Date(item.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
+                                    </div>
+                                </div>
+                                <button onclick="deleteItem(${item.id}, 'takes')" class="text-emerald-200 hover:text-rose-500 transition-colors px-2"><i class="fas fa-trash-alt text-lg"></i></button>
+                            </div>`;
+                    }
+                }).join('');
+            }
 
+            // Lista de medicamentos con botón de acción
             const ml = document.getElementById('medsList');
             ml.innerHTML = meds.map(m => `
-                <div class="card flex justify-between py-3">
-                    <div><p class="font-black italic">${m.name}</p><p class="text-[9px] text-slate-400 uppercase font-bold"><i class="far fa-clock"></i> ${m.time || '--:--'}</p></div>
+                <div class="card flex justify-between items-center py-4 border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center"><i class="fas fa-pills"></i></div>
+                        <div>
+                            <p class="font-black italic text-slate-900 text-sm leading-none">${m.name}</p>
+                            <p class="text-[10px] text-slate-400 uppercase font-black mt-1 italic"><i class="far fa-clock mr-1"></i> ${m.time || '--:--'}</p>
+                        </div>
+                    </div>
                     <div class="flex gap-2">
-                        <button onclick="logTake('${m.name}')" class="bg-emerald-500 text-white px-3 rounded-lg font-black text-[9px] uppercase btn-tap">LOG</button>
+                        <button onclick="logTake('${m.name}')" class="bg-emerald-500 text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase btn-tap shadow-lg shadow-emerald-100">LOG</button>
                         <button onclick="deleteItem(${m.id}, 'meds')" class="text-slate-200 px-2"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
@@ -485,7 +680,12 @@
         function confirmClear() { document.getElementById('confirmDeleteModal').style.display = 'flex'; }
         function clearAllData() { localStorage.clear(); location.reload(); }
         function closeWelcome() { localStorage.setItem('hc_v12_tos', 'true'); document.getElementById('welcomeModal').style.display = 'none'; }
-        function updateHeaderDate() { document.getElementById('headerDate').innerText = new Date().toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'short'}); }
+        
+        function updateHeaderDate() { 
+            const now = new Date();
+            const options = { weekday: 'long', day: 'numeric', month: 'short' };
+            document.getElementById('headerDate').innerText = now.toLocaleDateString('es-MX', options).toUpperCase(); 
+        }
 
         function initPaypal() {
             if(!window.paypal) return;
@@ -493,6 +693,7 @@
                 hostedButtonId: "WL5JJ94G938SW",
                 onApprove: (data) => {
                     localStorage.setItem('hc_v12_pro', 'true');
+                    alert("¡Gracias por su apoyo! HiperControl Pro activado.");
                     location.reload();
                 }
             }).render("#paypal-container-WL5JJ94G938SW");
