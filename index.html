@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HiperControl | Bitácora Médica</title>
+    <title>HiperControl | Bitácora Médica Profesional</title>
     
-    <!-- Dependencias Externas -->
+    <!-- Dependencias -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAfL26d5SicSjimR9qBK_7H7To8HiLp0a8OllLcR7_WNeyZaXxHZrIhsBLlUT96GMSBhLuN0un3kw-aK8&components=hosted-buttons&disable-funding=venmo&currency=MXN"></script>
 
     <style>
@@ -32,19 +31,16 @@
         }
 
         .page { display: none; }
-        .page.active { display: block; animation: slideUp 0.3s ease-out; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
 
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card { 
             background: white; 
             border-radius: 1.5rem; 
-            padding: 1.2rem; 
+            padding: 1.25rem; 
             border: 1px solid #e2e8f0; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
         }
 
         .input-med { 
@@ -59,26 +55,26 @@
         }
 
         .input-med:focus { border-color: var(--rose); background: white; }
-        .nav-active { color: var(--rose) !important; }
+        .nav-active { color: var(--rose) !important; transform: translateY(-3px); }
 
         .modal { 
             display: none; 
             position: fixed; 
             inset: 0; 
-            background: rgba(15, 23, 42, 0.8); 
-            backdrop-filter: blur(8px); 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(10px); 
             z-index: 9999; 
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
         }
 
-        .btn-tap:active { transform: scale(0.95); }
+        .btn-tap:active { transform: scale(0.96); }
         
         .status-badge { 
             font-size: 0.6rem; 
             font-weight: 800; 
-            padding: 0.2rem 0.5rem; 
+            padding: 0.25rem 0.6rem; 
             border-radius: 2rem; 
             text-transform: uppercase; 
         }
@@ -87,209 +83,233 @@
         .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
         .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
+        #socialBarContainer { 
+            min-height: 60px; 
+            width: 100%;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
         .sos-btn { 
             display: flex; 
             align-items: center; 
             gap: 1rem; 
-            padding: 1rem; 
+            padding: 1.2rem; 
             background: white; 
-            border-radius: 1.2rem; 
-            border-left: 6px solid #e2e8f0; 
+            border-radius: 1.5rem; 
+            border: 1px solid #e2e8f0;
             text-decoration: none; 
             color: inherit; 
             margin-bottom: 0.8rem; 
-            transition: 0.2s;
-        }
-
-        #socialBarArea {
-            min-height: 50px;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- MODALES -->
+    <!-- BIENVENIDA / TOS -->
     <div id="welcomeModal" class="modal" style="display: flex;">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col max-h-[90vh]">
-            <div class="text-center mb-6 shrink-0">
-                <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-3xl flex items-center justify-center text-2xl mx-auto mb-4">
-                    <i class="fas fa-user-shield"></i>
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col max-h-[85vh]">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-heart-pulse"></i>
                 </div>
-                <h3 class="font-black text-xl italic">HiperControl</h3>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Aviso Legal y Uso</p>
+                <h3 class="font-black text-2xl italic">HiperControl</h3>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Protocolo Médico V12 Ultra</p>
             </div>
-            <div class="overflow-y-auto pr-2 space-y-4 text-[11px] font-medium text-slate-600 leading-relaxed text-justify mb-6">
-                <p>⚠️ <strong>AVISO MÉDICO:</strong> Esta aplicación es una herramienta de apoyo para el registro. No es un dispositivo médico y no sustituye el diagnóstico profesional.</p>
-                <p>🛡️ <strong>PRIVACIDAD:</strong> Sus datos se almacenan localmente. HiperControl no sube sus registros médicos a servidores externos.</p>
-                <p>🏥 En caso de emergencia, llame al 911 o acuda a urgencias.</p>
+            <div class="overflow-y-auto pr-2 space-y-4 text-[11px] font-medium text-slate-500 leading-relaxed text-justify mb-6">
+                <p>📍 <strong>AVISO MÉDICO:</strong> Esta app es una bitácora de registro. No mide la presión por sí misma; requiere un baumanómetro externo.</p>
+                <p>🔒 <strong>PRIVACIDAD:</strong> Sus datos se guardan localmente. Nosotros no tenemos acceso a su información de salud.</p>
             </div>
-            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase">Aceptar</button>
+            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase">Entendido</button>
         </div>
     </div>
 
-    <div id="confirmDeleteModal" class="modal" onclick="closeModals()">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm text-center" onclick="event.stopPropagation()">
-            <div class="w-16 h-16 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
-                <i class="fas fa-trash-alt"></i>
-            </div>
-            <h3 class="font-black text-xl mb-2">¿Borrar todo?</h3>
-            <p class="text-xs text-slate-500 font-bold mb-6 italic">Esta acción limpiará el historial del teléfono.</p>
-            <div class="space-y-3">
-                <button onclick="clearAllData()" class="w-full bg-rose-500 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase">Sí, borrar</button>
-                <button onclick="closeModals()" class="w-full bg-slate-100 text-slate-400 py-4 rounded-2xl font-black text-xs btn-tap uppercase">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- MODAL EXPORTAR / PAYPAL -->
     <div id="exportModal" class="modal" onclick="closeModals()">
         <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm" onclick="event.stopPropagation()">
-            <h3 class="font-black text-2xl italic mb-2 text-center">Exportar</h3>
-            <p class="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 italic">Formatos disponibles</p>
+            <h3 class="font-black text-2xl italic mb-4 text-center">Compartir Reporte</h3>
             <div class="space-y-3">
-                <button onclick="triggerAdAndAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
+                <button onclick="triggerAdAndAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase tracking-widest">
                     <i class="fas fa-copy"></i> WhatsApp / Portapapeles
                 </button>
-                <button onclick="triggerAdAndAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
-                    <i class="fas fa-file-pdf"></i> PDF para el Médico
+                <button onclick="triggerAdAndAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase tracking-widest">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
                 </button>
-                <div id="paypal-container-WL5JJ94G938SW" class="mt-4"></div>
+                
+                <div id="paypalArea" class="pt-6 mt-4 border-t border-slate-100 text-center">
+                    <p class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-tighter italic">¿Cansado de anuncios? Desbloquea HiperControl Pro</p>
+                    <div id="paypal-container-WL5JJ94G938SW"></div>
+                </div>
             </div>
-            <p id="adNotice" class="text-[8px] text-center font-bold text-slate-400 mt-4 uppercase hidden">🔒 El anuncio de patrocinador permite el uso gratuito</p>
-            <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase">Cerrar</button>
+            <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase">Volver</button>
         </div>
     </div>
 
-    <!-- UI PRINCIPAL -->
-    <header class="sticky top-0 bg-white/80 backdrop-blur-md z-50 px-6 pt-10 pb-4 border-b border-slate-100 flex justify-between items-center">
+    <!-- HEADER -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-xl z-[100] px-6 pt-10 pb-4 border-b border-slate-100 flex justify-between items-center">
         <div>
-            <span id="headerDate" class="text-[9px] font-black text-rose-500 uppercase tracking-widest">Cargando...</span>
-            <h1 class="text-2xl font-black italic tracking-tighter">HiperControl <span class="text-rose-500" id="vTag">V12</span></h1>
+            <span id="headerDate" class="text-[9px] font-black text-rose-500 uppercase tracking-widest italic">-- -- --</span>
+            <h1 class="text-2xl font-black italic tracking-tighter">HiperControl <span id="vTag" class="text-rose-500">V12</span></h1>
         </div>
         <button onclick="openExport()" class="w-11 h-11 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg btn-tap">
-            <i class="fas fa-file-export"></i>
+            <i class="fas fa-share-nodes"></i>
         </button>
     </header>
 
     <main class="p-6 max-w-md mx-auto">
-        <div id="socialBarArea"></div>
+        <!-- ANUNCIO SOCIAL BAR -->
+        <div id="socialBarContainer"></div>
 
-        <!-- SALUD -->
+        <!-- PÁGINA: HOME (SALUD) -->
         <div id="page-home" class="page active">
-            <div class="card mb-6 border-b-4 border-rose-500">
+            <div class="card mb-6 border-b-8 border-rose-500">
                 <div class="flex gap-4 mb-4">
                     <div class="flex-1">
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block">Sistólica</label>
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block">Sistólica (Alta)</label>
                         <input type="number" id="sys" placeholder="120" class="input-med text-2xl text-center">
                     </div>
                     <div class="flex-1">
-                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block">Diastólica</label>
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block">Diastólica (Baja)</label>
                         <input type="number" id="dia" placeholder="80" class="input-med text-2xl text-center">
                     </div>
                 </div>
-                <div class="flex gap-2 mb-4">
+                <div class="flex gap-3 mb-4">
                     <select id="momento" class="input-med text-xs flex-1">
                         <option value="Ayunas">🌅 Ayunas</option>
                         <option value="Mañana">☀️ Mañana</option>
                         <option value="Tarde">🌆 Tarde</option>
                         <option value="Noche">🌙 Noche</option>
+                        <option value="Crisis">🚨 Crisis/Dolor</option>
                     </select>
-                    <input type="number" id="peso" placeholder="Peso kg" class="input-med text-xs w-24 text-center">
+                    <input type="number" id="peso" placeholder="kg" class="input-med text-xs w-20 text-center">
                 </div>
-                <button onclick="saveHealth()" class="w-full bg-rose-500 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-rose-100 btn-tap">Guardar</button>
-            </div>
-
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase italic">Historial de Hoy</h3>
-                <button onclick="confirmClear()" class="text-[9px] font-black text-slate-300 uppercase">Limpiar</button>
+                <button onclick="saveHealth()" class="w-full bg-rose-500 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg btn-tap">Guardar Medición</button>
             </div>
             
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-[10px] font-black text-slate-400 uppercase italic">Bitácora Unificada</h3>
+                <button onclick="confirmClear()" class="text-[9px] font-black text-slate-200 uppercase">Limpiar Todo</button>
+            </div>
             <div id="unifiedTimeline" class="space-y-4"></div>
         </div>
 
-        <!-- MEDICAMENTOS -->
+        <!-- PÁGINA: MEDICAMENTOS -->
         <div id="page-meds" class="page">
-            <h2 class="text-2xl font-black italic mb-2">Recetario</h2>
-            <div class="card mb-6">
-                <input type="text" id="mName" placeholder="Ej: Losartán 50mg" class="input-med mb-3">
+            <h2 class="text-2xl font-black italic mb-2 tracking-tighter">Recetario</h2>
+            <div class="card mb-6 border-b-8 border-slate-900">
+                <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block italic">Nombre y Dosis</label>
+                <input type="text" id="mName" placeholder="Enalapril 10mg..." class="input-med mb-3">
                 <div class="flex gap-2">
-                    <input type="time" id="mTime" class="input-med flex-1">
-                    <button onclick="addMedicine()" class="bg-slate-900 text-white px-6 rounded-xl font-black text-[10px] uppercase">Añadir</button>
+                    <div class="flex-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase ml-2 mb-1 block italic">Próxima Toma</label>
+                        <input type="time" id="mTime" class="input-med">
+                    </div>
+                    <button onclick="addMedicine()" class="bg-slate-900 text-white px-6 rounded-xl font-black text-[10px] uppercase btn-tap mt-5">Añadir</button>
                 </div>
             </div>
             <div id="medsList" class="space-y-3"></div>
         </div>
 
-        <!-- RIESGO -->
-        <div id="page-risk" class="page">
-            <h2 class="text-2xl font-black italic mb-4">Riesgo Cardiovascular</h2>
-            <div class="card space-y-4">
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Estimación rápida basada en factores</p>
-                <div class="space-y-2">
-                    <label class="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                        <span class="text-xs font-bold">¿Fuma actualmente?</span>
-                        <input type="checkbox" id="risk-smoke" class="w-5 h-5 accent-rose-500">
-                    </label>
-                    <label class="flex items-center justify-between bg-slate-50 p-3 rounded-xl">
-                        <span class="text-xs font-bold">¿Padece Diabetes?</span>
-                        <input type="checkbox" id="risk-db" class="w-5 h-5 accent-rose-500">
-                    </label>
+        <!-- PÁGINA: GUÍA Y SEMÁFORO -->
+        <div id="page-guide" class="page">
+            <h2 class="text-2xl font-black italic mb-6 tracking-tighter">Centro de Guía</h2>
+            <div class="space-y-4">
+                <div class="card border-l-8 border-emerald-500">
+                    <h4 class="font-black italic text-sm mb-1 uppercase text-emerald-600">Normal (Óptima)</h4>
+                    <p class="text-[11px] text-slate-500 font-bold uppercase">Sistólica < 120 y Diastólica < 80. Mantenga su estilo de vida saludable.</p>
                 </div>
-                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs uppercase">Calcular Score</button>
-                <div id="riskResult" class="hidden p-4 rounded-xl text-center font-black italic text-sm"></div>
+                <div class="card border-l-8 border-amber-500">
+                    <h4 class="font-black italic text-sm mb-1 uppercase text-amber-600">Elevada</h4>
+                    <p class="text-[11px] text-slate-500 font-bold uppercase">Sistólica 120-129. Momento de reducir sodio y estrés.</p>
+                </div>
+                <div class="card border-l-8 border-rose-500">
+                    <h4 class="font-black italic text-sm mb-1 uppercase text-rose-600">Hipertensión G1/G2</h4>
+                    <p class="text-[11px] text-slate-500 font-bold uppercase">Más de 130/80. Requiere monitoreo médico y posible ajuste de dosis.</p>
+                </div>
+                <div class="card bg-slate-900 text-white p-6">
+                    <h4 class="font-black italic text-lg mb-4 text-rose-400">🍎 Recomendación DASH</h4>
+                    <ul class="text-[10px] font-bold uppercase space-y-2 opacity-90">
+                        <li>• <span class="text-rose-300">SAL:</span> Evite embutidos y enlatados.</li>
+                        <li>• <span class="text-rose-300">POTASIO:</span> Consuma plátano y verduras verdes.</li>
+                        <li>• <span class="text-rose-300">PESO:</span> Mantenga su IMC bajo 25.</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
-        <!-- SOS -->
-        <div id="page-sos" class="page">
-            <h2 class="text-2xl font-black italic text-rose-600 mb-6 uppercase">Emergencias</h2>
-            <div class="space-y-3">
-                <a href="tel:911" class="sos-btn border-rose-500 bg-rose-50">
-                    <div class="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center"><i class="fas fa-phone-alt"></i></div>
-                    <div><p class="font-black text-rose-600 text-sm">911 EMERGENCIAS</p><p class="text-[8px] font-bold uppercase">Llamada Nacional</p></div>
-                </a>
-                <a href="tel:088" class="sos-btn border-slate-500">
-                    <div class="w-10 h-10 bg-slate-500 text-white rounded-xl flex items-center justify-center"><i class="fas fa-shield-alt"></i></div>
-                    <div><p class="font-black text-sm">088 GUARDIA NACIONAL</p><p class="text-[8px] font-bold uppercase">Asistencia en camino</p></div>
-                </a>
-                <a href="tel:5556581111" class="sos-btn border-blue-500">
-                    <div class="w-10 h-10 bg-blue-500 text-white rounded-xl flex items-center justify-center"><i class="fas fa-info-circle"></i></div>
-                    <div><p class="font-black text-sm text-blue-600">LOCATEL</p><p class="text-[8px] font-bold uppercase">Asesoría CDMX</p></div>
-                </a>
+        <!-- PÁGINA: RIESGO CARDIOVASCULAR -->
+        <div id="page-risk" class="page">
+            <h2 class="text-2xl font-black italic mb-2 tracking-tighter">Riesgo CV</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Calculadora de Factores</p>
+            <div class="card space-y-4">
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span class="text-xs font-black uppercase italic"><i class="fas fa-smoking mr-2"></i>Tabaquismo</span>
+                    <input type="checkbox" id="risk-smoke" class="w-6 h-6 accent-rose-500">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span class="text-xs font-black uppercase italic"><i class="fas fa-droplet mr-2"></i>Diabetes</span>
+                    <input type="checkbox" id="risk-db" class="w-6 h-6 accent-rose-500">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span class="text-xs font-black uppercase italic"><i class="fas fa-person-running mr-2"></i>Sedentarismo</span>
+                    <input type="checkbox" id="risk-sed" class="w-6 h-6 accent-rose-500">
+                </div>
+                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-xs uppercase btn-tap">Evaluar Riesgo</button>
+                <div id="riskResult" class="hidden p-6 rounded-2xl text-center font-black italic"></div>
             </div>
-            <div class="card mt-6 bg-slate-900 text-white">
-                <h4 class="font-black italic text-xs mb-2">🆘 ¿Cuándo llamar al 911?</h4>
-                <ul class="text-[9px] font-bold uppercase space-y-1 opacity-80">
-                    <li>• Dolor intenso en el pecho</li>
-                    <li>• Dificultad para hablar o caminar</li>
-                    <li>• Pérdida repentina de visión</li>
-                    <li>• Desmayos o confusión grave</li>
-                </ul>
+        </div>
+
+        <!-- PÁGINA: SOS -->
+        <div id="page-sos" class="page">
+            <h2 class="text-2xl font-black italic text-rose-600 mb-6 uppercase tracking-tighter">Centro SOS</h2>
+            <div class="space-y-4">
+                <a href="tel:911" class="sos-btn border-rose-500 bg-rose-50 animate-pulse">
+                    <div class="w-12 h-12 bg-rose-500 text-white rounded-xl flex items-center justify-center text-xl"><i class="fas fa-ambulance"></i></div>
+                    <div><p class="font-black text-rose-600 italic">911 EMERGENCIAS</p><p class="text-[9px] font-bold uppercase tracking-widest">México / General</p></div>
+                </a>
+                <a href="tel:5556581111" class="sos-btn">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl"><i class="fas fa-info-circle"></i></div>
+                    <div><p class="font-black text-blue-700 italic">LOCATEL</p><p class="text-[9px] font-bold uppercase">Orientación Médica</p></div>
+                </a>
             </div>
         </div>
     </main>
 
     <!-- NAVEGACIÓN -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 pb-8 z-50 shadow-2xl">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-5 pb-8 z-[200] shadow-2xl">
         <div class="max-w-md mx-auto flex justify-between items-center text-[8px] font-black uppercase text-slate-300">
-            <button onclick="tab('home', this)" class="flex flex-col items-center gap-1 nav-active flex-1"><i class="fas fa-heartbeat text-xl"></i>Salud</button>
-            <button onclick="tab('meds', this)" class="flex flex-col items-center gap-1 flex-1"><i class="fas fa-pills text-xl"></i>Meds</button>
-            <button onclick="tab('risk', this)" class="flex flex-col items-center gap-1 flex-1"><i class="fas fa-chart-line text-xl"></i>Riesgo</button>
-            <button onclick="tab('sos', this)" class="flex flex-col items-center gap-1 flex-1 text-slate-400"><i class="fas fa-ambulance text-xl"></i>SOS</button>
+            <button onclick="tab('home', this)" class="flex flex-col items-center gap-2 nav-active flex-1"><i class="fas fa-heartbeat text-xl"></i>Salud</button>
+            <button onclick="tab('meds', this)" class="flex flex-col items-center gap-2 flex-1"><i class="fas fa-pills text-xl"></i>Meds</button>
+            <button onclick="tab('guide', this)" class="flex flex-col items-center gap-2 flex-1"><i class="fas fa-book-medical text-xl"></i>Guía</button>
+            <button onclick="tab('risk', this)" class="flex flex-col items-center gap-2 flex-1"><i class="fas fa-chart-line text-xl"></i>Riesgo</button>
+            <button onclick="tab('sos', this)" class="flex flex-col items-center gap-2 flex-1 text-slate-400"><i class="fas fa-truck-medical text-xl"></i>SOS</button>
         </div>
     </nav>
 
+    <!-- MODAL CONFIRMAR BORRADO -->
+    <div id="confirmDeleteModal" class="modal" onclick="closeModals()">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm text-center">
+            <h3 class="font-black text-xl mb-6 italic uppercase">¿Borrar Historial?</h3>
+            <div class="flex gap-3">
+                <button onclick="clearAllData()" class="flex-1 bg-rose-500 text-white py-4 rounded-xl font-black uppercase text-xs btn-tap">Sí</button>
+                <button onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-400 py-4 rounded-xl font-black uppercase text-xs btn-tap">No</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // ESTADO DE LA APP
         let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
         let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
         let takes = JSON.parse(localStorage.getItem('hc_v12_takes')) || [];
         let isPro = localStorage.getItem('hc_v12_pro') === 'true';
 
-        // Anuncios
-        const SOCIAL_BAR = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
-        const POP_UNDER = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
+        // ANUNCIOS
+        const SOCIAL_BAR_SRC = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
+        const POP_UNDER_SRC = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
 
         window.onload = () => {
             updateHeaderDate();
@@ -301,57 +321,56 @@
         function checkProStatus() {
             if(isPro) {
                 document.getElementById('vTag').innerHTML = "V12 <i class='fas fa-crown text-amber-500'></i>";
-                document.getElementById('adNotice').classList.add('hidden');
+                document.getElementById('paypalArea').classList.add('hidden');
+                document.getElementById('socialBarContainer').style.display = 'none';
             } else {
                 initPaypal();
-                loadSocialBar();
-                document.getElementById('adNotice').classList.remove('hidden');
+                forceSocialBar();
             }
         }
 
-        function loadSocialBar() {
+        function forceSocialBar() {
             if(isPro) return;
-            const s = document.createElement('script');
-            s.src = SOCIAL_BAR;
-            document.getElementById('socialBarArea').appendChild(s);
+            const container = document.getElementById('socialBarContainer');
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = SOCIAL_BAR_SRC;
+            script.async = true;
+            container.appendChild(script);
         }
 
-        // EL POPUNDER SOLO SE ACTIVA AL EXPORTAR SI ES GRATIS
         function triggerAdAndAction(type) {
             if(isPro) {
                 handleAction(type);
                 return;
             }
-
-            if(confirm("Para exportar, se abrirá un anuncio de patrocinador. ¿Continuar?")) {
-                const s = document.createElement('script');
-                s.src = POP_UNDER;
-                document.body.appendChild(s); // Aquí se inyecta y molesta justo cuando exporta
-                
-                // Ejecutamos la acción después de la "molestia"
-                setTimeout(() => handleAction(type), 500);
+            if(confirm("Esta función gratuita incluye un anuncio patrocinado. ¿Desea continuar?")) {
+                const popScript = document.createElement('script');
+                popScript.src = POP_UNDER_SRC;
+                document.body.appendChild(popScript);
+                setTimeout(() => handleAction(type), 800);
             }
         }
 
         function handleAction(type) {
             if(type === 'copy') {
-                let t = "*📋 REPORTE HIPERCONTROL V12*\n\n";
-                db.slice(0, 15).forEach(r => {
-                    t += `${new Date(r.date).toLocaleDateString()} | ${r.sys}/${r.dia} | ${r.momento}\n`;
-                });
-                const area = document.createElement("textarea");
-                area.value = t; document.body.appendChild(area);
-                area.select(); document.execCommand("copy");
-                document.body.removeChild(area);
-                alert("¡Copiado al portapapeles!");
+                let text = "*📋 REPORTE HIPERCONTROL*\n\n";
+                db.slice(0, 15).forEach(r => text += `${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia}* | ${r.momento}\n`);
+                const el = document.createElement('textarea');
+                el.value = text; document.body.appendChild(el);
+                el.select(); document.execCommand('copy');
+                document.body.removeChild(el);
+                alert("Reporte copiado con éxito.");
                 closeModals();
             } else if(type === 'pdf') {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                doc.setFontSize(18); doc.text("Historial de Presión Arterial", 14, 20);
-                const rows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.momento, r.status.label]);
-                doc.autoTable({ head: [['Fecha', 'Medición', 'Momento', 'Estado']], body: rows, startY: 30 });
-                doc.save("HiperControl_Reporte.pdf");
+                doc.setTextColor(244, 63, 94);
+                doc.setFontSize(22);
+                doc.text("Reporte HiperControl V12", 14, 20);
+                const rows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.momento, r.status.label, r.peso ? r.peso+'kg' : '-']);
+                doc.autoTable({ head: [['Fecha', 'Presión', 'Momento', 'Estado', 'Peso']], body: rows, startY: 30, theme: 'grid' });
+                doc.save("Reporte_HiperControl.pdf");
                 closeModals();
             }
         }
@@ -359,13 +378,14 @@
         function saveHealth() {
             const sys = parseInt(document.getElementById('sys').value);
             const dia = parseInt(document.getElementById('dia').value);
+            const peso = document.getElementById('peso').value;
             if(!sys || !dia) return;
 
             let status = { label: 'Normal', bg: 'badge-verde' };
-            if(sys >= 140 || dia >= 90) status = { label: 'Hipertensión', bg: 'badge-rojo' };
+            if(sys >= 140 || dia >= 90) status = { label: 'Crisis', bg: 'badge-rojo' };
             else if(sys >= 130 || dia >= 85) status = { label: 'Elevada', bg: 'badge-amarillo' };
 
-            db.unshift({ id: Date.now(), type: 'pressure', sys, dia, momento: document.getElementById('momento').value, date: Date.now(), status });
+            db.unshift({ id: Date.now(), type: 'pressure', sys, dia, peso, momento: document.getElementById('momento').value, date: Date.now(), status });
             save();
             document.getElementById('sys').value = '';
             document.getElementById('dia').value = '';
@@ -382,27 +402,29 @@
         function logTake(name) {
             takes.unshift({ id: Date.now(), type: 'med', name, date: Date.now() });
             save();
-        }
-
-        function deleteItem(id, listType) {
-            if(listType === 'pressure') db = db.filter(x => x.id !== id);
-            if(listType === 'med') meds = meds.filter(x => x.id !== id);
-            save();
+            alert("Toma de " + name + " registrada.");
         }
 
         function calcRisk() {
-            const smoke = document.getElementById('risk-smoke').checked;
-            const dbCheck = document.getElementById('risk-db').checked;
-            let score = "BAJO";
-            let color = "bg-emerald-100 text-emerald-700";
-            
-            if(smoke && dbCheck) { score = "ALTO"; color = "bg-rose-100 text-rose-700"; }
-            else if(smoke || dbCheck) { score = "MODERADO"; color = "bg-amber-100 text-amber-700"; }
-            
+            const s = document.getElementById('risk-smoke').checked;
+            const d = document.getElementById('risk-db').checked;
+            const se = document.getElementById('risk-sed').checked;
+            let count = (s?1:0)+(d?1:0)+(se?1:0);
+            let lvl = "Bajo", cls = "bg-emerald-100 text-emerald-700";
+            if(count >= 3) { lvl = "Muy Alto"; cls = "bg-rose-600 text-white"; }
+            else if(count === 2) { lvl = "Alto"; cls = "bg-rose-100 text-rose-700"; }
+            else if(count === 1) { lvl = "Moderado"; cls = "bg-amber-100 text-amber-700"; }
             const res = document.getElementById('riskResult');
-            res.innerHTML = `Riesgo: ${score}`;
-            res.className = `p-4 rounded-xl text-center font-black italic text-sm ${color}`;
+            res.innerHTML = `<p class="uppercase text-[9px] opacity-70 mb-1">Resultado de Score</p><p class="text-2xl uppercase italic">${lvl}</p>`;
+            res.className = `p-8 rounded-2xl text-center font-black italic mt-4 ${cls}`;
             res.classList.remove('hidden');
+        }
+
+        function deleteItem(id, list) {
+            if(list === 'db') db = db.filter(i => i.id !== id);
+            else if(list === 'meds') meds = meds.filter(i => i.id !== id);
+            else if(list === 'takes') takes = takes.filter(i => i.id !== id);
+            save();
         }
 
         function save() {
@@ -413,55 +435,58 @@
         }
 
         function renderAll() {
-            const timeline = document.getElementById('unifiedTimeline');
-            const combined = [...db, ...takes].sort((a,b) => b.date - a.date).slice(0, 10);
-            timeline.innerHTML = '';
-            
-            combined.forEach(item => {
-                const d = new Date(item.date).toLocaleDateString();
+            const combined = [...db, ...takes].sort((a,b) => b.date - a.date).slice(0, 15);
+            const tl = document.getElementById('unifiedTimeline');
+            tl.innerHTML = combined.map(item => {
                 if(item.type === 'pressure') {
-                    timeline.innerHTML += `
-                        <div class="card flex justify-between items-center">
+                    return `
+                        <div class="card flex justify-between items-center border-l-8 border-rose-500">
                             <div>
                                 <span class="status-badge ${item.status.bg}">${item.status.label}</span>
-                                <p class="text-xl font-black">${item.sys}/${item.dia} <small class="text-[10px] opacity-40">mmHg</small></p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase">${d} • ${item.momento}</p>
+                                <p class="text-2xl font-black italic">${item.sys}/${item.dia}</p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase italic">${new Date(item.date).toLocaleDateString()} • ${item.momento} ${item.peso ? '• '+item.peso+'kg' : ''}</p>
                             </div>
-                            <button onclick="deleteItem(${item.id}, 'pressure')" class="text-slate-200"><i class="fas fa-times-circle"></i></button>
+                            <button onclick="deleteItem(${item.id}, 'db')" class="text-slate-200"><i class="fas fa-times-circle text-xl"></i></button>
                         </div>`;
                 } else {
-                    timeline.innerHTML += `
-                        <div class="card bg-emerald-50 border-emerald-100 flex justify-between items-center">
-                            <div><p class="text-xs font-black text-emerald-700 italic">💊 TOMA: ${item.name}</p><p class="text-[9px] font-bold opacity-60">${d}</p></div>
+                    return `
+                        <div class="card bg-emerald-50 border-emerald-100 flex justify-between items-center py-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center text-xs"><i class="fas fa-check"></i></div>
+                                <div><p class="text-[9px] font-black text-emerald-700 uppercase italic">Toma Registrada</p><p class="text-xs font-black italic">${item.name}</p></div>
+                            </div>
+                            <button onclick="deleteItem(${item.id}, 'takes')" class="text-emerald-200"><i class="fas fa-trash"></i></button>
                         </div>`;
                 }
-            });
+            }).join('');
 
-            const mList = document.getElementById('medsList');
-            mList.innerHTML = meds.map(m => `
+            const ml = document.getElementById('medsList');
+            ml.innerHTML = meds.map(m => `
                 <div class="card flex justify-between py-3">
-                    <div><p class="font-black text-sm italic">${m.name}</p><p class="text-[9px] text-slate-400 uppercase">${m.time || '--:--'}</p></div>
-                    <div class="flex gap-4">
-                        <button onclick="logTake('${m.name}')" class="text-emerald-500 font-black text-xs">LOG</button>
-                        <button onclick="deleteItem(${m.id}, 'med')" class="text-slate-300"><i class="fas fa-trash"></i></button>
+                    <div><p class="font-black italic">${m.name}</p><p class="text-[9px] text-slate-400 uppercase font-bold"><i class="far fa-clock"></i> ${m.time || '--:--'}</p></div>
+                    <div class="flex gap-2">
+                        <button onclick="logTake('${m.name}')" class="bg-emerald-500 text-white px-3 rounded-lg font-black text-[9px] uppercase btn-tap">LOG</button>
+                        <button onclick="deleteItem(${m.id}, 'meds')" class="text-slate-200 px-2"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function confirmClear() { document.getElementById('confirmDeleteModal').style.display = 'flex'; }
-        function clearAllData() { localStorage.clear(); location.reload(); }
+        function tab(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
+            document.getElementById(`page-${id}`).classList.add('active');
+            btn.classList.add('nav-active');
+            window.scrollTo(0,0);
+        }
+
         function openExport() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => { if(m.id !== 'welcomeModal') m.style.display = 'none'; }); }
-        function updateHeaderDate() { document.getElementById('headerDate').innerText = new Date().toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'short'}); }
-        function tab(id, btn) { 
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
-            document.getElementById(`page-${id}`).classList.add('active'); 
-            btn.classList.add('nav-active');
-        }
+        function confirmClear() { document.getElementById('confirmDeleteModal').style.display = 'flex'; }
+        function clearAllData() { localStorage.clear(); location.reload(); }
         function closeWelcome() { localStorage.setItem('hc_v12_tos', 'true'); document.getElementById('welcomeModal').style.display = 'none'; }
-        
+        function updateHeaderDate() { document.getElementById('headerDate').innerText = new Date().toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'short'}); }
+
         function initPaypal() {
             if(!window.paypal) return;
             paypal.HostedButtons({
