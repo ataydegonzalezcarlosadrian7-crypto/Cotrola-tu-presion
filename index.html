@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HiperControl</title>
+    <title>HiperControl | Bitácora Médica</title>
     
     <!-- Dependencias Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- PayPal SDK (Configurado con tu ID) -->
+    <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAfL26d5SicSjimR9qBK_7H7To8HiLp0a8OllLcR7_WNeyZaXxHZrIhsBLlUT96GMSBhLuN0un3kw-aK8&components=hosted-buttons&disable-funding=venmo&currency=MXN"></script>
 
     <style>
@@ -27,6 +27,7 @@
             font-family: 'Outfit', sans-serif; 
             padding-bottom: 120px; 
             overflow-x: hidden; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         .page { display: none; }
@@ -95,7 +96,6 @@
             transition: transform 0.2s;
         }
 
-        /* Semáforo de Salud */
         .badge-verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
         .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
@@ -103,7 +103,6 @@
         .delete-btn { color: #cbd5e1; transition: 0.3s; }
         .delete-btn:hover { color: #f43f5e; }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
     </style>
@@ -151,13 +150,12 @@
             <h3 class="font-black text-2xl italic mb-2 text-center">Compartir Datos</h3>
             <p class="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 italic">Selecciona el formato de envío</p>
             <div class="space-y-3">
-                <button onclick="handleAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2">
-                    <i class="fas fa-copy"></i> COPIAR PARA WHATSAPP
+                <button onclick="handleAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
+                    <i class="fas fa-copy"></i> Copiar para WhatsApp
                 </button>
-                <button onclick="handleAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2">
-                    <i class="fas fa-file-pdf"></i> GENERAR PDF MÉDICO
+                <button onclick="handleAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-2 uppercase">
+                    <i class="fas fa-file-pdf"></i> Generar PDF Médico
                 </button>
-                <!-- Contenedor PayPal -->
                 <div id="paypal-container-WL5JJ94G938SW" class="mt-4"></div>
             </div>
             <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase">Cerrar</button>
@@ -177,7 +175,7 @@
 
     <main class="p-6 max-w-md mx-auto">
 
-        <!-- PÁGINA: INICIO / SALUD -->
+        <!-- PÁGINA: SALUD -->
         <div id="page-home" class="page active">
             <div class="card mb-6">
                 <div class="flex gap-4 mb-4">
@@ -211,7 +209,7 @@
             </div>
             
             <div id="unifiedTimeline" class="space-y-4 relative">
-                <!-- Timeline line rendering here -->
+                <!-- Se llena dinámicamente -->
             </div>
         </div>
 
@@ -287,7 +285,7 @@
 
         <!-- PÁGINA: SOS -->
         <div id="page-sos" class="page">
-            <h2 class="text-3xl font-black italic text-rose-600 mb-6">Centro SOS</h2>
+            <h2 class="text-3xl font-black italic text-rose-600 mb-6 uppercase tracking-tighter">Centro SOS</h2>
             <div class="space-y-3">
                 <a href="tel:911" class="sos-btn border-rose-500 bg-rose-50 animate-pulse">
                     <div class="w-12 h-12 bg-rose-500 text-white rounded-xl flex items-center justify-center text-xl shadow-lg shadow-rose-200"><i class="fas fa-phone-alt"></i></div>
@@ -297,9 +295,10 @@
                     <div class="w-10 h-10 bg-slate-100 text-red-600 rounded-lg flex items-center justify-center"><i class="fas fa-ambulance"></i></div>
                     <div><p class="font-black text-sm italic">CRUZ ROJA</p></div>
                 </a>
-                <a href="tel:8006232323" class="sos-btn border-emerald-500">
+                <!-- Enlace IMSS actualizado -->
+                <a href="http://www.imss.gob.mx/salud-en-linea" target="_blank" class="sos-btn border-emerald-500">
                     <div class="w-10 h-10 bg-slate-100 text-emerald-500 rounded-lg flex items-center justify-center"><i class="fas fa-hospital"></i></div>
-                    <div><p class="font-black text-sm italic">ORIENTACIÓN IMSS</p></div>
+                    <div><p class="font-black text-sm italic uppercase">Orientación IMSS</p><p class="text-[8px] font-bold text-slate-400 uppercase">Sitio Oficial de Salud</p></div>
                 </a>
             </div>
         </div>
@@ -317,10 +316,7 @@
         </div>
     </nav>
 
-    <div id="social-bar-container"></div>
-
     <script>
-        // Inicialización de datos
         let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
         let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
         let takes = JSON.parse(localStorage.getItem('hc_v12_takes')) || [];
@@ -334,7 +330,6 @@
                 document.getElementById('welcomeModal').style.display = 'none';
             }
 
-            // Gestión de publicidad / Estado Pro
             if(!isPro) {
                 initPaypal();
             } else {
@@ -396,7 +391,6 @@
             sysInput.value = '';
             diaInput.value = '';
             
-            // Retroalimentación visual
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "¡REGISTRADO!";
@@ -421,12 +415,8 @@
         }
 
         function clearAllData() {
-            db = [];
-            takes = [];
-            meds = [];
+            db = []; takes = []; meds = [];
             localStorage.clear();
-            save();
-            closeModals();
             location.reload();
         }
 
@@ -459,7 +449,6 @@
             
             if(combined.length === 0) {
                 timeline.innerHTML += '<p class="text-center py-10 text-[10px] font-black text-slate-300 uppercase italic">Sin registros aún</p>';
-                return;
             }
 
             combined.forEach(item => {
@@ -506,7 +495,6 @@
                 }
             });
 
-            // Renderizar lista de medicamentos activos
             const mList = document.getElementById('medsList');
             if(meds.length === 0) {
                 mList.innerHTML = '<p class="text-center text-[10px] font-black text-slate-300 py-4 uppercase">No hay medicamentos configurados</p>';
@@ -551,57 +539,36 @@
         }
 
         function openExport() { document.getElementById('exportModal').style.display = 'flex'; }
-        
         function closeModals() { 
-            document.querySelectorAll('.modal').forEach(m => {
-                if(m.id !== 'welcomeModal') m.style.display = 'none';
-            });
+            document.querySelectorAll('.modal').forEach(m => { if(m.id !== 'welcomeModal') m.style.display = 'none'; });
         }
 
         function handleAction(type) {
-            // Lógica Pro/Anuncios si fuera necesario
-            executeExport(type);
-        }
-
-        function executeExport(type) {
-            if(type === 'copy') copyToClipboard();
-            if(type === 'pdf') generatePDF();
-        }
-
-        function copyToClipboard() {
-            if(db.length === 0) return;
-            let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*ÚLTIMAS MEDICIONES:*\n";
-            db.slice(0, 15).forEach(r => {
-                t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.status.label})\n`;
-            });
-            t += "\n_Generado por HiperControl App_";
-            
-            const area = document.createElement("textarea");
-            area.value = t;
-            document.body.appendChild(area);
-            area.select();
-            try {
-                document.execCommand("copy");
-                alert("¡Copiado al portapapeles!");
-            } catch (err) {
-                console.error("Error al copiar", err);
+            if(type === 'copy') {
+                if(db.length === 0) return;
+                let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*ÚLTIMAS MEDICIONES:*\n";
+                db.slice(0, 15).forEach(r => {
+                    t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.status.label})\n`;
+                });
+                t += "\n_Generado por HiperControl App_";
+                const area = document.createElement("textarea");
+                area.value = t; document.body.appendChild(area);
+                area.select();
+                try { document.execCommand("copy"); } catch (err) {}
+                document.body.removeChild(area);
+                closeModals();
             }
-            document.body.removeChild(area);
-            closeModals();
+            if(type === 'pdf') generatePDF();
         }
 
         function generatePDF() {
             if(db.length === 0) return;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            doc.setFontSize(22);
-            doc.setTextColor(244, 63, 94);
+            doc.setFontSize(22); doc.setTextColor(244, 63, 94);
             doc.text("HiperControl - Reporte Médico", 20, 20);
-            
-            doc.setFontSize(10);
-            doc.setTextColor(100);
-            doc.text("Historial de presión arterial generado desde la aplicación.", 20, 28);
+            doc.setFontSize(10); doc.setTextColor(100);
+            doc.text("Historial generado desde la aplicación.", 20, 28);
 
             const rows = db.map(r => [
                 new Date(r.date).toLocaleDateString(), 
@@ -613,12 +580,9 @@
 
             doc.autoTable({ 
                 head: [['Fecha', 'Tensión (mmHg)', 'Estado', 'Momento', 'Peso']], 
-                body: rows, 
-                startY: 35,
-                theme: 'striped',
-                headStyles: { fillStyle: [15, 23, 42] }
+                body: rows, startY: 35, theme: 'striped',
+                headStyles: { fillColor: [15, 23, 42] }
             });
-
             doc.save("Reporte_HiperControl.pdf");
             closeModals();
         }
@@ -626,13 +590,10 @@
         function initPaypal() {
             const container = document.getElementById('paypal-container-WL5JJ94G938SW');
             if(!container) return;
-            
             paypal.HostedButtons({
                 hostedButtonId: "WL5JJ94G938SW",
                 onApprove: (data) => {
-                    isPro = true; 
-                    localStorage.setItem('hc_v12_pro', 'true');
-                    alert("¡Gracias por tu apoyo! Versión PRO activada.");
+                    isPro = true; localStorage.setItem('hc_v12_pro', 'true');
                     location.reload();
                 }
             }).render("#paypal-container-WL5JJ94G938SW");
