@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HiperControl Pro v12 - Suite Médica Total</title>
+    <title>HiperControl</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -26,9 +26,34 @@
         .btn-tap:active { transform: scale(0.95); }
         .status-badge { font-size: 0.65rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 2rem; text-transform: uppercase; }
         .sos-btn { display: flex; align-items: center; gap: 1rem; padding: 1.2rem; background: white; border-radius: 1.2rem; border-left: 6px solid #e2e8f0; text-decoration: none; color: inherit; margin-bottom: 0.8rem; }
+        
+        /* Estilos Semáforo */
+        .badge-verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
     </style>
 </head>
 <body>
+
+    <!-- MODAL DE BIENVENIDA Y AVISO LEGAL (REQUERIDO PLAY STORE) -->
+    <div id="welcomeModal" class="modal" style="display: flex;">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm overflow-y-auto max-h-[80vh]" onclick="event.stopPropagation()">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="font-black text-2xl italic">HiperControl</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aviso Legal y Uso</p>
+            </div>
+            <div class="space-y-4 text-[11px] font-medium text-slate-600 leading-relaxed text-justify mb-6">
+                <p>⚠️ <strong>AVISO MÉDICO:</strong> Esta aplicación es una herramienta de apoyo para el registro y monitoreo de la presión arterial. <strong>No es un dispositivo médico</strong> y no sustituye el diagnóstico ni tratamiento de un profesional de la salud.</p>
+                <p>📊 <strong>FUNCIÓN:</strong> Registra tus mediciones diarias para facilitar el reporte a tu médico. Los colores mostrados son guías basadas en criterios generales de salud en México.</p>
+                <p>🛡️ <strong>PRIVACIDAD:</strong> Sus datos se almacenan de forma local en su dispositivo para su seguridad.</p>
+                <p>🏥 En caso de emergencia o síntomas graves, acuda inmediatamente al centro de salud más cercano.</p>
+            </div>
+            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap uppercase tracking-widest">Aceptar y Continuar</button>
+        </div>
+    </div>
 
     <!-- MODAL DE EXPORTACIÓN Y ANUNCIOS -->
     <div id="exportModal" class="modal" onclick="closeModals()">
@@ -121,22 +146,18 @@
                     </p>
                 </div>
                 <div class="card border-l-8 border-rose-500">
-                    <h4 class="font-black italic text-sm mb-4">⚖️ Tabla de Valores</h4>
+                    <h4 class="font-black italic text-sm mb-4">⚖️ Tabla de Valores (México)</h4>
                     <div class="space-y-2">
                         <div class="flex justify-between items-center border-b border-slate-50 pb-1">
-                            <span class="text-[10px] font-black text-emerald-600">ÓPTIMA</span>
-                            <span class="text-xs font-black">120/80</span>
+                            <span class="text-[10px] font-black text-emerald-600">NORMAL (VERDE)</span>
+                            <span class="text-xs font-black">< 120/80</span>
                         </div>
                         <div class="flex justify-between items-center border-b border-slate-50 pb-1">
-                            <span class="text-[10px] font-black text-emerald-400">NORMAL</span>
-                            <span class="text-xs font-black">120-129 / 80-84</span>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-slate-50 pb-1">
-                            <span class="text-[10px] font-black text-amber-500">PRE-H</span>
+                            <span class="text-[10px] font-black text-amber-500">ALTA (AMARILLO)</span>
                             <span class="text-xs font-black">130-139 / 85-89</span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] font-black text-rose-500">HTA G1</span>
+                            <span class="text-[10px] font-black text-rose-500">HIPERTENSIÓN (ROJO)</span>
                             <span class="text-xs font-black">> 140/90</span>
                         </div>
                     </div>
@@ -198,7 +219,6 @@
         </div>
     </nav>
 
-    <!-- ANUNCIO SOCIAL BAR (Nativo) -->
     <div id="social-bar-container"></div>
 
     <script>
@@ -212,25 +232,30 @@
             renderAll();
             initPaypal();
             
-            // Lógica de Anuncios: Solo si no es Pro
+            // Si ya aceptó antes, no mostrar modal de bienvenida
+            if(localStorage.getItem('hc_v12_tos')) {
+                document.getElementById('welcomeModal').style.display = 'none';
+            }
+
             if(!isPro) {
-                // 1. Cargar Banner Estándar
                 const s = document.createElement('script');
                 s.src = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
                 document.body.appendChild(s);
 
-                // 2. Cargar Social Bar Nativo
                 const socialScript = document.createElement('script');
                 socialScript.type = 'text/javascript';
                 socialScript.src = '//pl29004811.highperformanceformat.com/51/93/29/51932976be964860b2f5f1902891d3bd.js';
                 document.getElementById('social-bar-container').appendChild(socialScript);
             } else {
-                // Interfaz limpia para Pro
                 document.getElementById('vTag').innerHTML = "V12 <i class='fas fa-check-circle text-blue-400 text-xs'></i>";
-                // Asegurar que el contenedor social bar esté vacío
                 document.getElementById('social-bar-container').innerHTML = '';
             }
         };
+
+        function closeWelcome() {
+            localStorage.setItem('hc_v12_tos', 'true');
+            document.getElementById('welcomeModal').style.display = 'none';
+        }
 
         function updateHeaderDate() {
             const d = new Date();
@@ -245,15 +270,20 @@
         }
 
         function saveHealth() {
-            const sys = document.getElementById('sys').value;
-            const dia = document.getElementById('dia').value;
+            const sys = parseInt(document.getElementById('sys').value);
+            const dia = parseInt(document.getElementById('dia').value);
             const momento = document.getElementById('momento').value;
             const peso = document.getElementById('peso').value;
             if(!sys || !dia) return;
 
-            let status = { label: 'Normal', bg: 'bg-emerald-100', color: 'text-emerald-600' };
-            if(sys >= 140 || dia >= 90) status = { label: 'HTA G1', bg: 'bg-rose-100', color: 'text-rose-600' };
-            else if(sys >= 130 || dia >= 85) status = { label: 'Elevada', bg: 'bg-amber-100', color: 'text-amber-600' };
+            // LÓGICA DE SEMÁFORO (MÉXICO)
+            let status = { label: 'Normal', bg: 'badge-verde', color: 'text-emerald-700' };
+            
+            if(sys >= 140 || dia >= 90) {
+                status = { label: 'Crisis/HTA G1', bg: 'badge-rojo', color: 'text-rose-700' };
+            } else if (sys >= 130 || dia >= 85) {
+                status = { label: 'Elevada', bg: 'badge-amarillo', color: 'text-amber-700' };
+            }
 
             db.unshift({ id: Date.now(), type: 'pressure', sys, dia, momento, peso, date: Date.now(), status });
             save();
@@ -294,7 +324,7 @@
                 if(item.type === 'pressure') {
                     timeline.innerHTML += `
                         <div class="relative pl-14 mb-4">
-                            <div class="absolute left-4 top-2 w-4 h-4 rounded-full bg-white border-4 border-rose-500 z-10"></div>
+                            <div class="absolute left-4 top-2 w-4 h-4 rounded-full bg-white border-4 border-slate-200 z-10"></div>
                             <div class="card py-3">
                                 <div class="flex justify-between items-start">
                                     <div>
@@ -352,14 +382,10 @@
 
         function handleAction(type) {
             if(!isPro) {
-                // Inyectar popunder solicitado solo para usuarios no premium
                 const s = document.createElement('script');
                 s.src = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
                 document.body.appendChild(s);
-                
-                setTimeout(() => {
-                    executeExport(type);
-                }, 800);
+                setTimeout(() => { executeExport(type); }, 800);
             } else {
                 executeExport(type);
             }
@@ -371,31 +397,26 @@
         }
 
         function copyToClipboard() {
-            if(db.length === 0) return alert("Sin datos registrados");
+            if(db.length === 0) return;
             let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*TENSIÓN RECIENTE:*\n";
             db.slice(0, 10).forEach(r => {
-                t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.momento})\n`;
+                t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.status.label})\n`;
             });
-            t += "\n*ÚLTIMAS TOMAS:* \n";
-            takes.slice(0, 5).forEach(l => {
-                t += `✅ ${l.name} - ${new Date(l.date).toLocaleString()}\n`;
-            });
-            t += "\n_Generado profesionalmente por HiperControl V12_";
+            t += "\n_Generado por HiperControl App_";
             const area = document.createElement("textarea");
             area.value = t; document.body.appendChild(area);
             area.select(); document.execCommand("copy");
             document.body.removeChild(area);
-            alert("📋 Reporte copiado. ¡Ya puedes pegarlo en WhatsApp!");
             closeModals();
         }
 
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.setFontSize(22); doc.setTextColor(244, 63, 94); doc.text("HiperControl Pro V12 - Reporte", 20, 20);
-            const rows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.status.label, r.momento, r.peso || '-']);
-            doc.autoTable({ head: [['Fecha', 'Tensión', 'Estado', 'Momento', 'Peso']], body: rows, startY: 30, theme: 'striped' });
-            doc.save("Reporte_Medico.pdf");
+            doc.setFontSize(22); doc.setTextColor(244, 63, 94); doc.text("HiperControl - Reporte de Salud", 20, 20);
+            const rows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.status.label, r.momento]);
+            doc.autoTable({ head: [['Fecha', 'Tensión', 'Estado', 'Momento']], body: rows, startY: 30 });
+            doc.save("HiperControl_Reporte.pdf");
             closeModals();
         }
 
