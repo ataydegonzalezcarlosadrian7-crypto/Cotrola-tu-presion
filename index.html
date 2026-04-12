@@ -295,7 +295,6 @@
                     <div class="w-10 h-10 bg-slate-100 text-red-600 rounded-lg flex items-center justify-center"><i class="fas fa-ambulance"></i></div>
                     <div><p class="font-black text-sm italic">CRUZ ROJA</p></div>
                 </a>
-                <!-- Enlace IMSS actualizado -->
                 <a href="http://www.imss.gob.mx/salud-en-linea" target="_blank" class="sos-btn border-emerald-500">
                     <div class="w-10 h-10 bg-slate-100 text-emerald-500 rounded-lg flex items-center justify-center"><i class="fas fa-hospital"></i></div>
                     <div><p class="font-black text-sm italic uppercase">Orientación IMSS</p><p class="text-[8px] font-bold text-slate-400 uppercase">Sitio Oficial de Salud</p></div>
@@ -391,7 +390,7 @@
             sysInput.value = '';
             diaInput.value = '';
             
-            const btn = event.target;
+            const btn = event.currentTarget;
             const originalText = btn.innerText;
             btn.innerText = "¡REGISTRADO!";
             btn.classList.replace('bg-rose-500', 'bg-emerald-500');
@@ -545,12 +544,30 @@
 
         function handleAction(type) {
             if(type === 'copy') {
-                if(db.length === 0) return;
-                let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n*ÚLTIMAS MEDICIONES:*\n";
-                db.slice(0, 15).forEach(r => {
-                    t += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia} mmHg* (${r.status.label})\n`;
-                });
+                if(db.length === 0 && takes.length === 0) return;
+                
+                let t = "*📋 BITÁCORA MÉDICA - HIPERCONTROL V12*\n\n";
+                
+                // Sección de Presión
+                t += "*💉 MEDICIONES REGISTRADAS:*\n";
+                if(db.length > 0) {
+                    db.slice(0, 20).forEach(r => {
+                        const date = new Date(r.date);
+                        t += `• ${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} | *${r.sys}/${r.dia} mmHg* | ${r.momento} ${r.peso ? '| '+r.peso+'kg' : ''}\n`;
+                    });
+                } else { t += "_Sin registros de presión_\n"; }
+
+                // Sección de Medicamentos
+                t += "\n*💊 TOMAS DE MEDICAMENTOS:*\n";
+                if(takes.length > 0) {
+                    takes.slice(0, 20).forEach(tk => {
+                        const date = new Date(tk.date);
+                        t += `• ${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} | *${tk.name}*\n`;
+                    });
+                } else { t += "_Sin tomas registradas_\n"; }
+
                 t += "\n_Generado por HiperControl App_";
+                
                 const area = document.createElement("textarea");
                 area.value = t; document.body.appendChild(area);
                 area.select();
@@ -562,16 +579,22 @@
         }
 
         function generatePDF() {
-            if(db.length === 0) return;
+            if(db.length === 0 && takes.length === 0) return;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
+            // Header
             doc.setFontSize(22); doc.setTextColor(244, 63, 94);
             doc.text("HiperControl - Reporte Médico", 20, 20);
             doc.setFontSize(10); doc.setTextColor(100);
-            doc.text("Historial generado desde la aplicación.", 20, 28);
+            doc.text("Reporte detallado de salud y medicamentos.", 20, 28);
 
-            const rows = db.map(r => [
-                new Date(r.date).toLocaleDateString(), 
+            // Tabla 1: Mediciones
+            doc.setFontSize(14); doc.setTextColor(15, 23, 42);
+            doc.text("1. Mediciones de Presión Arterial", 20, 40);
+
+            const pressureRows = db.map(r => [
+                new Date(r.date).toLocaleDateString() + ' ' + new Date(r.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 
                 `${r.sys}/${r.dia}`, 
                 r.status.label, 
                 r.momento,
@@ -579,11 +602,33 @@
             ]);
 
             doc.autoTable({ 
-                head: [['Fecha', 'Tensión (mmHg)', 'Estado', 'Momento', 'Peso']], 
-                body: rows, startY: 35, theme: 'striped',
-                headStyles: { fillColor: [15, 23, 42] }
+                head: [['Fecha/Hora', 'Tensión (mmHg)', 'Estado', 'Momento', 'Peso']], 
+                body: pressureRows, 
+                startY: 45, 
+                theme: 'striped',
+                headStyles: { fillColor: [244, 63, 94] }
             });
-            doc.save("Reporte_HiperControl.pdf");
+
+            // Tabla 2: Medicamentos
+            let lastY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(14); doc.setTextColor(16, 185, 129);
+            doc.text("2. Registro de Medicamentos Tomados", 20, lastY);
+
+            const medicineRows = takes.map(tk => [
+                new Date(tk.date).toLocaleDateString() + ' ' + new Date(tk.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+                tk.name,
+                "Completado"
+            ]);
+
+            doc.autoTable({
+                head: [['Fecha/Hora', 'Medicamento', 'Estado']],
+                body: medicineRows,
+                startY: lastY + 5,
+                theme: 'striped',
+                headStyles: { fillColor: [16, 185, 129] }
+            });
+
+            doc.save("Reporte_HiperControl_Detallado.pdf");
             closeModals();
         }
 
