@@ -2,702 +2,417 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HiperControl V12 Ultra Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ElectroMaster PRO | Enterprise Learning</title>
     
-    <!-- Librerías de Terceros -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- SDK PAYPAL -->
     <script src="https://www.paypal.com/sdk/js?client-id=BAAfL26d5SicSjimR9qBK_7H7To8HiLp0a8OllLcR7_WNeyZaXxHZrIhsBLlUT96GMSBhLuN0un3kw-aK8&components=hosted-buttons&disable-funding=venmo&currency=MXN"></script>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono&display=swap');
         
-        :root { 
-            --rose: #f43f5e; 
-            --slate: #0f172a; 
-            --emerald: #10b981; 
-            --amber: #f59e0b;
+        :root {
+            --bg-dark: #0f172a;
+            --surface: #1e293b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
         }
-
-        body { 
-            background: #f8fafc; 
-            font-family: 'Outfit', sans-serif; 
-            padding-bottom: 140px; 
-            overflow-x: hidden; 
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .page { display: none; }
-        .page.active { display: block; animation: slideUp 0.4s ease-out; }
-
-        @keyframes slideUp { 
-            from { opacity: 0; transform: translateY(20px); } 
-            to { opacity: 1; transform: translateY(0); } 
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .card { 
-            background: white; 
-            border-radius: 1.5rem; 
-            padding: 1.25rem; 
-            border: 1px solid #e2e8f0; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+        .level-node {
+            width: 70px;
+            height: 70px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
-            overflow: hidden;
+            z-index: 10;
         }
 
-        .input-med { 
-            background: #f1f5f9; 
-            border: 2px solid #e2e8f0; 
-            border-radius: 1rem; 
-            padding: 0.8rem; 
-            width: 100%; 
-            font-weight: 700; 
-            outline: none; 
-            transition: 0.3s; 
+        .level-node.locked {
+            filter: grayscale(1) opacity(0.3);
+            cursor: not-allowed;
         }
 
-        .input-med:focus { border-color: var(--rose); background: white; box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1); }
-        .nav-active { color: var(--rose) !important; transform: translateY(-5px); font-weight: 800; }
-
-        .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(15, 23, 42, 0.9); 
-            backdrop-filter: blur(8px); 
-            z-index: 9999; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px; 
+        .level-node.completed {
+            background: var(--success);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            color: white;
         }
 
-        .btn-tap:active { transform: scale(0.95); }
-        
-        .status-badge { 
-            font-size: 0.65rem; 
-            font-weight: 800; 
-            padding: 0.3rem 0.7rem; 
-            border-radius: 2rem; 
-            text-transform: uppercase; 
-            display: inline-block;
-            margin-bottom: 0.5rem;
+        .level-node.current {
+            background: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+            transform: scale(1.1);
+            color: white;
         }
 
-        .badge-verde { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .badge-amarillo { background: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
-        .badge-rojo { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
-        .sos-grid-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            border-radius: 1.5rem;
-            text-align: center;
-            gap: 0.5rem;
-            transition: 0.2s;
+        .option-card {
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .ad-placeholder {
-            background: #f1f5f9;
-            border: 2px dashed #cbd5e1;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100px;
-            margin: 1rem 0;
-            color: #94a3b8;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
+        .option-card.selected {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.15);
         }
 
-        #socialBarContainer { min-height: 50px; width: 100%; margin-bottom: 10px; }
+        .option-card.correct {
+            background: rgba(16, 185, 129, 0.2) !important;
+            border-color: var(--success) !important;
+        }
+
+        .option-card.wrong {
+            background: rgba(239, 68, 68, 0.2) !important;
+            border-color: var(--danger) !important;
+        }
+
+        .explanation-box {
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-    <!-- MODAL DE BIENVENIDA -->
-    <div id="welcomeModal" class="modal" style="display: flex;">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col max-h-[90vh]">
-            <div class="text-center mb-6">
-                <div class="w-20 h-20 bg-rose-500 text-white rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-xl shadow-rose-200">
-                    <i class="fas fa-heart-pulse"></i>
-                </div>
-                <h3 class="font-black text-2xl italic text-slate-900">HiperControl V12</h3>
-                <p class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Tecnología de Monitoreo Pro</p>
+    <!-- Header UI -->
+    <header class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-bolt text-white"></i>
             </div>
-            <div class="overflow-y-auto pr-2 space-y-4 text-[12px] font-medium text-slate-600 leading-relaxed text-justify mb-6">
-                <p>⚡ <strong>IMPORTANTE:</strong> Esta aplicación es una herramienta de registro y análisis. No realiza mediciones de presión arterial directamente; requiere el uso de un baumanómetro certificado.</p>
-                <p>🔒 <strong>DATOS SEGUROS:</strong> Su información es privada y se almacena únicamente en la memoria local de su dispositivo.</p>
-                <p>📋 <strong>INSTRUCCIONES:</strong> Registre sus tomas de presión y medicamentos diariamente para generar un reporte médico válido para su especialista.</p>
+            <div>
+                <h1 class="font-extrabold text-lg leading-none tracking-tight">ELECTRO<span class="text-blue-500">PRO</span></h1>
+                <p class="text-[9px] text-slate-400 font-mono uppercase tracking-[0.2em]">Industrial Training</p>
             </div>
-            <button onclick="closeWelcome()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-sm btn-tap uppercase tracking-widest">Comenzar Protocolo</button>
         </div>
-    </div>
-
-    <!-- MODAL EXPORTAR / PRO -->
-    <div id="exportModal" class="modal" onclick="closeModals()">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm" onclick="event.stopPropagation()">
-            <div class="text-center mb-6">
-                <h3 class="font-black text-2xl italic text-slate-900">Generar Reporte</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase italic">Exportación de Datos Médicos</p>
+        
+        <div class="flex items-center gap-4 bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/5 shadow-inner">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-heart text-red-500"></i>
+                <span id="life-count" class="font-bold text-sm">3</span>
             </div>
-            
-            <div class="space-y-3">
-                <button onclick="triggerAdAndAction('copy')" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-emerald-100">
-                    <i class="fas fa-whatsapp text-lg"></i> Enviar a WhatsApp
-                </button>
-                <button onclick="triggerAdAndAction('pdf')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs btn-tap flex items-center justify-center gap-3 uppercase tracking-widest shadow-lg shadow-slate-200">
-                    <i class="fas fa-file-pdf text-lg"></i> Descargar PDF Pro
-                </button>
-                
-                <div id="paypalArea" class="pt-6 mt-6 border-t border-slate-100 text-center">
-                    <div class="bg-amber-50 p-4 rounded-2xl mb-4 border border-amber-100">
-                        <p class="text-[10px] font-black text-amber-600 uppercase mb-1"><i class="fas fa-crown mr-1"></i> HiperControl Pro</p>
-                        <p class="text-[11px] font-bold text-slate-500 italic">Elimina anuncios y exporta sin esperas por solo $50 MXN</p>
-                    </div>
-                    <div id="paypal-container-WL5JJ94G938SW"></div>
-                </div>
+            <div class="w-[1px] h-4 bg-white/10"></div>
+            <div class="flex items-center gap-2 text-yellow-500">
+                <i class="fas fa-star"></i>
+                <span id="star-count" class="font-bold text-sm">0</span>
             </div>
-            <button onclick="closeModals()" class="w-full mt-6 text-[10px] font-black text-slate-300 uppercase hover:text-rose-500 transition-colors">Cancelar</button>
         </div>
-    </div>
-
-    <!-- HEADER UI -->
-    <header class="sticky top-0 bg-white/90 backdrop-blur-xl z-[100] px-6 pt-12 pb-5 border-b border-slate-100 flex justify-between items-end">
-        <div>
-            <span id="headerDate" class="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] italic">-- -- --</span>
-            <h1 class="text-3xl font-black italic tracking-tighter text-slate-900 leading-none mt-1">HiperControl <span id="vTag" class="text-rose-500">V12</span></h1>
-        </div>
-        <button onclick="openExport()" class="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-xl btn-tap">
-            <i class="fas fa-share-nodes text-lg"></i>
-        </button>
     </header>
 
-    <!-- NAVEGACIÓN -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 p-6 pb-10 z-[200] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div class="max-w-md mx-auto flex justify-between items-center text-[9px] font-black uppercase text-slate-300">
-            <button onclick="tab('home', this)" class="flex flex-col items-center gap-2 nav-active transition-all"><i class="fas fa-heartbeat text-2xl"></i>Inicio</button>
-            <button onclick="tab('meds', this)" class="flex flex-col items-center gap-2 transition-all"><i class="fas fa-pills text-2xl"></i>Meds</button>
-            <button onclick="tab('guide', this)" class="flex flex-col items-center gap-2 transition-all"><i class="fas fa-book-medical text-2xl"></i>Guía</button>
-            <button onclick="tab('risk', this)" class="flex flex-col items-center gap-2 transition-all"><i class="fas fa-chart-line text-2xl"></i>Riesgo</button>
-            <button onclick="tab('sos', this)" class="flex flex-col items-center gap-2 transition-all text-rose-300"><i class="fas fa-phone-alt text-2xl"></i>SOS</button>
-        </div>
-    </nav>
-
-    <main class="p-6 max-w-md mx-auto">
-        
-        <div id="socialBarContainer"></div>
-
-        <!-- PÁGINA: HOME -->
-        <div id="page-home" class="page active">
-            <div class="card mb-8 border-b-[10px] border-rose-500">
-                <div class="flex gap-4 mb-5">
-                    <div class="flex-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Sistólica (Alta)</label>
-                        <input type="number" id="sys" placeholder="120" class="input-med text-3xl text-center">
-                    </div>
-                    <div class="flex-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Diastólica (Baja)</label>
-                        <input type="number" id="dia" placeholder="80" class="input-med text-3xl text-center">
-                    </div>
-                </div>
-                <div class="flex gap-4 mb-5">
-                    <div class="flex-1">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Momento</label>
-                        <select id="momento" class="input-med text-xs">
-                            <option value="Ayunas">🌅 Ayunas</option>
-                            <option value="Post-Desayuno">🍳 Post-Desayuno</option>
-                            <option value="Tarde">🌆 Tarde</option>
-                            <option value="Noche">🌙 Noche</option>
-                            <option value="Antes de dormir">🛏️ Antes de dormir</option>
-                            <option value="Crisis">⚠️ Crisis / Dolor</option>
-                        </select>
-                    </div>
-                    <div class="w-24">
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Peso</label>
-                        <input type="number" id="peso" placeholder="kg" class="input-med text-center text-sm">
-                    </div>
-                </div>
-                <button onclick="saveHealth()" class="w-full bg-rose-500 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-rose-200 btn-tap">Guardar Medición</button>
+    <main class="flex-grow">
+        <!-- Mapa de Niveles -->
+        <section id="view-map" class="p-8 max-w-lg mx-auto">
+            <div class="mb-12 text-center">
+                <h2 class="text-3xl font-extrabold mb-2 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Certificación PRO</h2>
+                <p class="text-slate-500 text-sm">Domina los 100 niveles de ingeniería electrónica</p>
             </div>
             
-            <div class="flex justify-between items-center mb-6 px-2">
-                <h3 class="text-[11px] font-black text-slate-900 uppercase italic flex items-center gap-2">
-                    <i class="fas fa-history text-rose-500"></i> Historial Médico Completo
-                </h3>
-                <button onclick="confirmClear()" class="text-[10px] font-black text-slate-300 uppercase hover:text-rose-500">Limpiar</button>
+            <div id="levels-container" class="relative flex flex-col items-center gap-12 pb-24">
+                <!-- Inyectado dinámicamente -->
             </div>
+        </section>
 
-            <!-- Aquí se mezclan mediciones y tomas de medicación -->
-            <div id="unifiedTimeline" class="space-y-4"></div>
-        </div>
-
-        <!-- PÁGINA: MEDICAMENTOS -->
-        <div id="page-meds" class="page">
-            <h2 class="text-2xl font-black italic mb-2 text-slate-900">Recetario Digital</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Administración de Tratamiento</p>
-            
-            <div class="card mb-8 border-b-[10px] border-slate-900">
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Fármaco y Miligramos</label>
-                        <input type="text" id="mName" placeholder="Ej: Losartán 50mg" class="input-med">
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="flex-1">
-                            <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block italic">Horario Programado</label>
-                            <input type="time" id="mTime" class="input-med">
-                        </div>
-                        <button onclick="addMedicine()" class="bg-slate-900 text-white px-8 rounded-2xl font-black text-[10px] uppercase btn-tap mt-7 shadow-lg shadow-slate-200">Añadir</button>
+        <!-- Quiz Interface -->
+        <section id="view-quiz" class="hidden fixed inset-0 z-[60] bg-slate-950 flex flex-col">
+            <div class="p-5 border-b border-white/5 flex items-center justify-between glass">
+                <button onclick="exitQuiz()" class="text-slate-500 hover:text-white transition-colors">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div class="flex-grow max-w-md mx-8">
+                    <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="quiz-bar" class="h-full bg-blue-500 transition-all duration-700 w-0"></div>
                     </div>
                 </div>
+                <div class="text-[10px] font-mono text-slate-500 bg-slate-900 px-3 py-1 rounded-md border border-white/5" id="level-indicator">LVL 00</div>
             </div>
 
-            <div id="medsList" class="space-y-4 mb-8"></div>
-
-            <!-- ANUNCIO IFRAME (Medicacion) -->
-            <div id="ad-meds" class="flex justify-center py-4 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '6e5a453a36b12cb65c0dbf1ddaed2be1',
-                        'format' : 'iframe',
-                        'height' : 300,
-                        'width' : 160,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://www.highperformanceformat.com/6e5a453a36b12cb65c0dbf1ddaed2be1/invoke.js"></script>
-            </div>
-        </div>
-
-        <!-- PÁGINA: GUÍA MÉDICA -->
-        <div id="page-guide" class="page">
-            <h2 class="text-2xl font-black italic mb-2 text-slate-900">Guía de Control</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Estándares Médicos AHA/ESC</p>
-            
-            <div class="space-y-4">
-                <div class="card border-l-[12px] border-emerald-500">
-                    <h4 class="font-black italic text-emerald-600 uppercase text-sm mb-1">Óptima (Saludable)</h4>
-                    <p class="text-[11px] font-bold text-slate-500 uppercase leading-relaxed">Sistólica < 120 mmHg <br> Diastólica < 80 mmHg</p>
-                    <div class="mt-2 text-[10px] text-emerald-800 bg-emerald-50 p-2 rounded-lg font-bold">RECOMENDACIÓN: Mantenga dieta baja en sodio y ejercicio diario.</div>
-                </div>
-                <div class="card border-l-[12px] border-amber-500">
-                    <h4 class="font-black italic text-amber-600 uppercase text-sm mb-1">Presión Elevada</h4>
-                    <p class="text-[11px] font-bold text-slate-500 uppercase leading-relaxed">Sistólica 120-129 mmHg <br> Diastólica < 80 mmHg</p>
-                    <div class="mt-2 text-[10px] text-amber-800 bg-amber-50 p-2 rounded-lg font-bold">RIESGO: Usted tiene mayor probabilidad de desarrollar hipertensión si no actúa ahora.</div>
-                </div>
-                <div class="card border-l-[12px] border-rose-500">
-                    <h4 class="font-black italic text-rose-600 uppercase text-sm mb-1">Hipertensión Grado 1/2</h4>
-                    <p class="text-[11px] font-bold text-slate-500 uppercase leading-relaxed">Sistólica 130-140+ mmHg <br> Diastólica 80-90+ mmHg</p>
-                    <div class="mt-2 text-[10px] text-rose-800 bg-rose-50 p-2 rounded-lg font-bold">ALERTA: Contacte a su médico para iniciar o ajustar tratamiento farmacológico.</div>
-                </div>
-
-                <div class="card bg-slate-900 text-white p-6 mt-6">
-                    <h4 class="font-black italic text-xl mb-4 text-rose-400 italic flex items-center gap-2">
-                        <i class="fas fa-apple-whole"></i> Protocolo DASH
-                    </h4>
-                    <div class="space-y-4 text-[11px] font-bold uppercase tracking-tight opacity-90">
-                        <div class="flex gap-3">
-                            <span class="text-rose-400">01</span>
-                            <p>Elimine por completo el salero de la mesa y evite alimentos procesados.</p>
+            <div class="flex-grow overflow-y-auto p-6 md:p-12">
+                <div class="max-w-2xl mx-auto w-full">
+                    <div id="question-box">
+                        <div id="category-tag" class="inline-block px-3 py-1 bg-blue-500/10 text-blue-400 rounded-lg text-[10px] font-bold uppercase tracking-widest mb-6 border border-blue-500/20">TEMA</div>
+                        <h3 id="question-text" class="text-xl md:text-3xl font-medium mb-10 leading-snug text-slate-100">Cargando...</h3>
+                        
+                        <div id="options-grid" class="grid grid-cols-1 gap-4">
+                            <!-- Opciones -->
                         </div>
-                        <div class="flex gap-3">
-                            <span class="text-rose-400">02</span>
-                            <p>Aumente consumo de frutas, vegetales y lácteos bajos en grasa.</p>
-                        </div>
-                        <div class="flex gap-3">
-                            <span class="text-rose-400">03</span>
-                            <p>Realice al menos 30 minutos de actividad aeróbica 5 veces por semana.</p>
+
+                        <div id="explanation" class="hidden explanation-box mt-8 p-6 rounded-2xl bg-slate-900/50 border border-white/5">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Fundamento Técnico</h4>
+                            <p id="explanation-text" class="text-sm text-slate-300 leading-relaxed"></p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- PÁGINA: RIESGO CV -->
-        <div id="page-risk" class="page">
-            <h2 class="text-2xl font-black italic mb-2 text-slate-900">Cálculo de Riesgo</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-6 italic tracking-widest">Factores de Supervivencia</p>
-            
-            <div class="card space-y-4 mb-8">
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-smoking text-slate-400"></i>
-                        <span class="text-xs font-black uppercase italic text-slate-600">Fumador Activo</span>
-                    </div>
-                    <input type="checkbox" id="risk-smoke" class="w-7 h-7 accent-rose-500">
+            <footer class="p-6 glass border-t border-white/5">
+                <div class="max-w-2xl mx-auto">
+                    <button id="btn-next" onclick="handleMainAction()" disabled
+                            class="w-full py-5 bg-slate-800 text-slate-500 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 tracking-widest uppercase">
+                        Comprobar Respuesta
+                    </button>
                 </div>
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-droplet text-slate-400"></i>
-                        <span class="text-xs font-black uppercase italic text-slate-600">Diabetes / Glucosa Alta</span>
-                    </div>
-                    <input type="checkbox" id="risk-db" class="w-7 h-7 accent-rose-500">
-                </div>
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-person-running text-slate-400"></i>
-                        <span class="text-xs font-black uppercase italic text-slate-600">Sin Actividad Física</span>
-                    </div>
-                    <input type="checkbox" id="risk-sed" class="w-7 h-7 accent-rose-500">
-                </div>
-                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-weight-scale text-slate-400"></i>
-                        <span class="text-xs font-black uppercase italic text-slate-600">Sobrepeso / Obesidad</span>
-                    </div>
-                    <input type="checkbox" id="risk-ob" class="w-7 h-7 accent-rose-500">
-                </div>
-                <button onclick="calcRisk()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-xs uppercase btn-tap shadow-lg shadow-slate-200">Evaluar Estado Cardiovascular</button>
-                <div id="riskResult" class="hidden animate-fadeIn"></div>
-            </div>
-
-            <!-- NATIVE BANNER (Riesgo CV) -->
-            <div id="ad-risk" class="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-4 overflow-hidden min-h-[150px]">
-                <script async="async" data-cfasync="false" src="https://pl28961994.profitablecpmratenetwork.com/04e776b88f82609a4b44e12d4eebd8e9/invoke.js"></script>
-                <div id="container-04e776b88f82609a4b44e12d4eebd8e9"></div>
-            </div>
-        </div>
-
-        <!-- PÁGINA: SOS -->
-        <div id="page-sos" class="page">
-            <h2 class="text-2xl font-black italic text-rose-600 mb-2 uppercase tracking-tighter">Emergencias</h2>
-            <p class="text-[10px] font-bold text-slate-400 uppercase mb-8 italic tracking-widest">Protocolo de Atención Inmediata</p>
-            
-            <div class="grid grid-cols-1 gap-4">
-                <a href="tel:911" class="sos-grid-btn bg-rose-500 text-white shadow-xl shadow-rose-200 animate-pulse">
-                    <i class="fas fa-phone-alt text-3xl mb-2"></i>
-                    <p class="font-black text-lg italic">911</p>
-                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-80">Atención Ciudadana</p>
-                </a>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <a href="tel:5556581111" class="sos-grid-btn bg-white border-2 border-slate-100 text-slate-900">
-                        <i class="fas fa-info-circle text-blue-500 text-2xl mb-1"></i>
-                        <p class="font-black italic text-sm">LOCATEL</p>
-                        <p class="text-[8px] font-bold uppercase text-slate-400">Orientación</p>
-                    </a>
-                    <a href="tel:5553951111" class="sos-grid-btn bg-white border-2 border-slate-100 text-slate-900">
-                        <i class="fas fa-briefcase-medical text-rose-500 text-2xl mb-1"></i>
-                        <p class="font-black italic text-sm">CRUZ ROJA</p>
-                        <p class="text-[8px] font-bold uppercase text-slate-400">Paramédicos</p>
-                    </a>
-                </div>
-
-                <div class="card bg-rose-50 border-rose-100 mt-4 p-6">
-                    <h4 class="font-black italic text-rose-600 uppercase text-xs mb-3 flex items-center gap-2">
-                        <i class="fas fa-triangle-exclamation"></i> Cuándo llamar al 911:
-                    </h4>
-                    <ul class="text-[10px] font-bold text-rose-800 space-y-3 uppercase leading-tight">
-                        <li>🚨 Dolor opresivo en el pecho que se irradia al brazo.</li>
-                        <li>🚨 Dificultad súbita para hablar o parálisis facial.</li>
-                        <li>🚨 Visión borrosa extrema con dolor de cabeza intenso.</li>
-                        <li>🚨 Presión Sistólica mayor a 180 mmHg en reposo.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+            </footer>
+        </section>
     </main>
 
-    <!-- MODALES DE APOYO -->
-    <div id="confirmDeleteModal" class="modal" onclick="closeModals()">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm text-center">
-            <h3 class="font-black text-xl mb-6 italic text-slate-900 uppercase">¿Restablecer Bitácora?</h3>
-            <p class="text-xs font-bold text-slate-400 uppercase mb-6 italic">Esta acción borrará todas sus mediciones y medicamentos de forma permanente.</p>
-            <div class="flex gap-4">
-                <button onclick="clearAllData()" class="flex-1 bg-rose-500 text-white py-5 rounded-2xl font-black uppercase text-xs btn-tap shadow-lg shadow-rose-100">Borrar</button>
-                <button onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-400 py-5 rounded-2xl font-black uppercase text-xs btn-tap">No</button>
+    <!-- Modal de Recarga -->
+    <div id="life-modal" class="fixed inset-0 z-[100] bg-slate-950/95 hidden items-center justify-center p-6 backdrop-blur-xl">
+        <div class="bg-slate-900 border border-white/10 rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-24 h-24 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8 border border-red-500/20 shadow-inner">
+                <i class="fas fa-bolt-lightning text-4xl"></i>
             </div>
+            <h2 class="text-2xl font-black mb-3">SISTEMA OFFLINE</h2>
+            <p class="text-slate-400 text-sm mb-10 leading-relaxed">Energía agotada. Adquiere una recarga de celdas para continuar con la capacitación inmediata.</p>
+            
+            <div id="paypal-container-V2J2E7EYWRR2U" class="mb-6"></div>
+            
+            <button onclick="closeLifeModal()" class="text-slate-500 text-xs font-bold hover:text-white transition-colors uppercase tracking-[0.2em]">
+                Cerrar Protocolo
+            </button>
         </div>
     </div>
 
     <script>
-        // ESTADO GLOBAL
-        let db = JSON.parse(localStorage.getItem('hc_v12_records')) || [];
-        let meds = JSON.parse(localStorage.getItem('hc_v12_meds')) || [];
-        let takes = JSON.parse(localStorage.getItem('hc_v12_takes')) || [];
-        let isPro = localStorage.getItem('hc_v12_pro') === 'true';
+        // --- BASE DE DATOS COMPLETA ---
+        const database = [
+            { id: 1, nivel: "básico", tema: "Ley de Ohm", pregunta: "En un resistor de 4.7 kΩ circula una corriente de 2.5 mA. ¿Cuál es la caída de tensión medida en sus terminales?", opciones: ["1.175 V", "11.75 V", "117.5 V", "1.175 mV"], respuesta: 1, explicacion: "V = I * R: 0.0025 A * 4700 Ω = 11.75 V." },
+            { id: 2, nivel: "básico", tema: "Circuitos serie/paralelo", pregunta: "Se conectan tres resistores de 100 Ω en paralelo. ¿Cuál es la resistencia equivalente del conjunto?", opciones: ["300 Ω", "100 Ω", "33.33 Ω", "0.03 Ω"], respuesta: 2, explicacion: "Req = R / n. En este caso, 100 / 3 = 33.33 Ω." },
+            { id: 3, nivel: "básico", tema: "Capacitores", pregunta: "¿Cuál es la capacitancia equivalente de dos capacitores de 10 µF conectados en serie?", opciones: ["20 µF", "10 µF", "5 µF", "1 µF"], respuesta: 2, explicacion: "Ceq = (C1 * C2) / (C1 + C2) = 100 / 20 = 5 µF." },
+            { id: 4, nivel: "básico", tema: "Inductores", pregunta: "¿Qué sucede con la reactancia inductiva (XL) de una bobina si la frecuencia se duplica?", opciones: ["Se reduce a la mitad", "Permanece constante", "Se cuadruplica", "Se duplica"], respuesta: 3, explicacion: "XL = 2πfL. Al ser proporcional a la frecuencia, si f se duplica, XL también." },
+            { id: 5, nivel: "básico", tema: "Diodos", pregunta: "¿Cuál es la tensión de umbral aproximada (Vf) para un diodo de silicio estándar como el 1N4007?", opciones: ["0.3 V", "0.7 V", "1.2 V", "5.0 V"], respuesta: 1, explicacion: "El silicio requiere aprox 0.7 V para vencer la barrera de potencial." },
+            { id: 6, nivel: "básico", tema: "Transistores BJT", pregunta: "En un transistor NPN en región activa, ¿cuál es la polarización de sus uniones?", opciones: ["BE inversa, BC directa", "BE directa, BC directa", "BE inversa, BC inversa", "BE directa, BC inversa"], respuesta: 3, explicacion: "Para amplificar, la unión Base-Emisor debe estar en directa y la Base-Colector en inversa." },
+            { id: 7, nivel: "básico", tema: "Electrónica digital", pregunta: "¿Cuál es el resultado binario de la suma de 1010 + 0101?", opciones: ["1111", "1000", "10101", "1110"], respuesta: 0, explicacion: "1010 (10) + 0101 (5) = 1111 (15)." },
+            { id: 8, nivel: "básico", tema: "Seguridad eléctrica", pregunta: "¿Qué dispositivo protege a las personas contra fugas de corriente a tierra?", opciones: ["Fusible", "Termomagnético", "Interruptor diferencial (GFCI)", "Varistor"], respuesta: 2, explicacion: "El diferencial detecta desequilibrios entre fase y neutro." },
+            { id: 9, nivel: "básico", tema: "Instrumentación", pregunta: "Para medir corriente, ¿cómo debe conectarse el amperímetro?", opciones: ["En paralelo fuente", "En serie carga", "En paralelo carga", "Entre chasis y tierra"], respuesta: 1, explicacion: "El amperímetro tiene baja impedancia y debe ser atravesado por la corriente." },
+            { id: 10, nivel: "básico", tema: "MOSFET", pregunta: "¿Qué terminal de un MOSFET controla la conducción entre Drenador y Fuente?", opciones: ["Base", "Emisor", "Compuerta (Gate)", "Ánodo"], respuesta: 2, explicacion: "El Gate controla el campo eléctrico del canal." },
+            { id: 11, nivel: "intermedio", tema: "Amplificadores operacionales", pregunta: "En un inversor con Rin = 10 kΩ y Rf = 100 kΩ, ¿cuál es la ganancia (Av)?", opciones: ["10", "-10", "11", "-0.1"], respuesta: 1, explicacion: "Av = -Rf / Rin = -100k / 10k = -10." },
+            { id: 12, nivel: "intermedio", tema: "Transistores BJT", pregunta: "Si β = 150 e Ib = 20 µA, ¿cuál es Ic?", opciones: ["3 mA", "30 mA", "0.3 mA", "1.5 mA"], respuesta: 0, explicacion: "Ic = β * Ib = 150 * 20µA = 3 mA." },
+            { id: 13, nivel: "intermedio", tema: "Diodos", pregunta: "¿Qué parámetro define la máxima tensión inversa soportable por un diodo?", opciones: ["Vf", "Ir", "PRV / PIV", "Vgamma"], respuesta: 2, explicacion: "Peak Inverse Voltage es el límite en polarización inversa." },
+            { id: 14, nivel: "intermedio", tema: "Circuitos", pregunta: "Divisor de tensión: Vin=12V, R1=2kΩ, R2=1kΩ. ¿Vout en R2?", opciones: ["8 V", "4 V", "6 V", "2 V"], respuesta: 1, explicacion: "Vout = 12 * (1k / 3k) = 4 V." },
+            { id: 15, nivel: "intermedio", tema: "Digital", pregunta: "¿Función lógica que da '0' solo cuando todas sus entradas son '1'?", opciones: ["AND", "OR", "NAND", "NOR"], respuesta: 2, explicacion: "NAND es el inverso de AND." },
+            { id: 16, nivel: "intermedio", tema: "Capacitores", pregunta: "¿Constante τ de un circuito RC con R = 47 kΩ y C = 100 µF?", opciones: ["4.7 s", "0.47 s", "47 s", "470 ms"], respuesta: 0, explicacion: "τ = R * C = 47000 * 0.0001 = 4.7 s." },
+            { id: 17, nivel: "intermedio", tema: "Inductores", pregunta: "Transformador ideal Np=500, Ns=50. Si Vp=230V, ¿Vs?", opciones: ["2300 V", "23 V", "46 V", "115 V"], respuesta: 1, explicacion: "Vs = 230 * (50/500) = 23 V." },
+            { id: 18, nivel: "intermedio", tema: "MOSFET", pregunta: "¿Qué ocurre en un MOSFET de enriquecimiento cuando Vgs < Vth?", opciones: ["Saturación", "Corte", "Región Óhmica", "Avalancha"], respuesta: 1, explicacion: "Sin tensión de umbral, el dispositivo no conduce." },
+            { id: 19, nivel: "intermedio", tema: "Instrumentación", pregunta: "¿Función del Trigger en un osciloscopio?", opciones: ["Amplitud", "Base tiempo", "Estabilizar visualización", "Medir R"], respuesta: 2, explicacion: "Sincroniza el barrido con un punto de la señal." },
+            { id: 20, nivel: "intermedio", tema: "Seguridad", pregunta: "¿Resistencia de tierra máxima recomendada residencial (NEC)?", opciones: ["1000 Ω", "100 Ω", "25 Ω", "1 Ω"], respuesta: 2, explicacion: "25 Ω es el estándar para disipación segura." }
+            // Los siguientes 80 niveles usarían un generador de variantes técnicas similares.
+        ];
 
-        const SOCIAL_BAR_SRC = "https://pl29004761.profitablecpmratenetwork.com/30/eb/10/30eb107ad8464e31b5f5305fbb3a1e7e.js";
-        const POP_UNDER_SRC = "https://pl28961993.profitablecpmratenetwork.com/f7/f6/5a/f7f65acc8892891d3bd01cb99c6cdafb.js";
-
-        window.onload = () => {
-            updateHeaderDate();
-            renderAll();
-            checkProStatus();
-            if(localStorage.getItem('hc_v12_tos')) document.getElementById('welcomeModal').style.display = 'none';
+        // --- ESTADO DEL JUEGO ---
+        let state = {
+            lives: 3,
+            stars: parseInt(localStorage.getItem('electro_pro_stars')) || 0,
+            progress: parseInt(localStorage.getItem('electro_pro_prog')) || 1,
+            currentLevel: null,
+            selectedIdx: null,
+            isAnswering: false
         };
 
-        function checkProStatus() {
-            if(isPro) {
-                document.getElementById('vTag').innerHTML = "PRO <i class='fas fa-crown text-amber-500'></i>";
-                document.getElementById('paypalArea').classList.add('hidden');
-                document.getElementById('socialBarContainer').style.display = 'none';
-                document.getElementById('ad-meds').style.display = 'none';
-                document.getElementById('ad-risk').style.display = 'none';
-            } else {
-                initPaypal();
-                loadSocialBar();
+        // --- RENDERIZADO DEL MAPA ---
+        function renderMap() {
+            const container = document.getElementById('levels-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 100; i++) {
+                const node = document.createElement('div');
+                const isLocked = i > state.progress;
+                const isDone = i < state.progress;
+                const isNext = i === state.progress;
+
+                node.className = `level-node rounded-2xl flex items-center justify-center font-bold text-lg 
+                                  ${isLocked ? 'locked bg-slate-800' : 'cursor-pointer'} 
+                                  ${isDone ? 'completed' : ''} 
+                                  ${isNext ? 'current' : 'text-slate-500 bg-slate-800/50'}`;
+                
+                node.innerHTML = isDone ? '<i class="fas fa-check"></i>' : (isLocked ? '<i class="fas fa-lock text-sm"></i>' : i);
+                
+                // Efecto de zigzag premium
+                const offset = Math.sin(i * 0.9) * 50;
+                node.style.transform = `translateX(${offset}px)`;
+
+                if (!isLocked) node.onclick = () => startQuiz(i);
+                container.appendChild(node);
             }
         }
 
-        function loadSocialBar() {
-            if(isPro) return;
-            const script = document.createElement('script');
-            script.src = SOCIAL_BAR_SRC;
-            script.async = true;
-            document.getElementById('socialBarContainer').appendChild(script);
-        }
-
-        // FLUJO DE EXPORTACIÓN CON POPUNDER
-        function triggerAdAndAction(type) {
-            if(isPro) {
-                handleAction(type);
+        // --- CONTROLADOR DE QUIZ ---
+        function startQuiz(id) {
+            if (state.lives <= 0) {
+                showLifeModal();
                 return;
             }
+
+            // Fallback para niveles no definidos aún en el demo
+            state.currentLevel = database.find(l => l.id === id) || {
+                ...database[0], 
+                id: id, 
+                pregunta: `Pregunta técnica avanzada de nivel ${id} (Módulo de expansión en desarrollo).`,
+                opciones: ["Opción A", "Opción B", "Opción C", "Opción D"],
+                respuesta: 0
+            };
+
+            state.selectedIdx = null;
+            state.isAnswering = false;
+
+            document.getElementById('view-map').classList.add('hidden');
+            document.getElementById('view-quiz').classList.remove('hidden');
+            document.getElementById('explanation').classList.add('hidden');
             
-            const confirmAd = confirm("Esta función es gratuita gracias a anunciantes. Se abrirá publicidad externa y después podrá descargar su archivo. ¿Acepta?");
+            renderQuizContent();
+        }
+
+        function renderQuizContent() {
+            const q = state.currentLevel;
+            document.getElementById('question-text').innerText = q.pregunta;
+            document.getElementById('category-tag').innerText = q.tema;
+            document.getElementById('level-indicator').innerText = `LVL ${q.id.toString().padStart(2, '0')}`;
+            document.getElementById('quiz-bar').style.width = `${(q.id / 100) * 100}%`;
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+
+            q.opciones.forEach((opt, i) => {
+                const card = document.createElement('div');
+                card.className = "option-card glass p-5 rounded-2xl cursor-pointer flex items-center gap-4 text-slate-300 font-medium";
+                card.innerHTML = `
+                    <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xs font-mono border border-white/10">${i + 1}</div>
+                    <span>${opt}</span>
+                `;
+                card.onclick = () => selectOption(i);
+                grid.appendChild(card);
+            });
+
+            resetNextBtn();
+        }
+
+        function selectOption(idx) {
+            if (state.isAnswering) return;
+            state.selectedIdx = idx;
             
-            if(confirmAd) {
-                // Inyectar Popunder
-                const popScript = document.createElement('script');
-                popScript.src = POP_UNDER_SRC;
-                document.body.appendChild(popScript);
-                
-                // Ejecutar después de que el navegador procese el popunder
-                setTimeout(() => handleAction(type), 1500);
+            document.querySelectorAll('.option-card').forEach((c, i) => {
+                c.classList.toggle('selected', i === idx);
+            });
+
+            const btn = document.getElementById('btn-next');
+            btn.disabled = false;
+            btn.classList.replace('bg-slate-800', 'bg-blue-600');
+            btn.classList.replace('text-slate-500', 'text-white');
+        }
+
+        function handleMainAction() {
+            if (!state.isAnswering) {
+                checkAnswer();
+            } else {
+                if (state.lives > 0) {
+                    if (state.selectedIdx === state.currentLevel.respuesta) {
+                        exitQuiz();
+                    } else {
+                        startQuiz(state.currentLevel.id); // Reintentar mismo
+                    }
+                } else {
+                    exitQuiz();
+                }
             }
         }
 
-        function handleAction(type) {
-            if(type === 'copy') {
-                let text = "*📋 REPORTE HIPERCONTROL V12 PRO*\n";
-                text += "------------------------------\n\n";
-                text += "*REGISTROS DE PRESIÓN:*\n";
-                db.slice(0, 20).forEach(r => {
-                    text += `• ${new Date(r.date).toLocaleDateString()} | *${r.sys}/${r.dia}* | ${r.momento} ${r.peso ? '| '+r.peso+'kg' : ''}\n`;
-                });
-                text += "\n*TOMAS DE MEDICAMENTOS:*\n";
-                takes.slice(0, 10).forEach(t => {
-                    text += `• ${new Date(t.date).toLocaleDateString()} | ${new Date(t.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} | ${t.name}\n`;
-                });
-                
-                const el = document.createElement('textarea');
-                el.value = text; document.body.appendChild(el);
-                el.select(); document.execCommand('copy');
-                document.body.removeChild(el);
-                alert("¡Reporte completo copiado al portapapeles!");
-                closeModals();
-            } else if(type === 'pdf') {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                doc.setFont("helvetica", "bold");
-                doc.setTextColor(244, 63, 94);
-                doc.text("REPORTE MÉDICO: HIPERCONTROL V12", 14, 20);
-                
-                // Tabla de Presión
-                doc.setTextColor(15, 23, 42);
-                doc.setFontSize(12);
-                doc.text("HISTORIAL DE PRESIÓN ARTERIAL", 14, 30);
-                const pressureRows = db.map(r => [new Date(r.date).toLocaleDateString(), `${r.sys}/${r.dia}`, r.momento, r.status.label, r.peso ? r.peso+'kg' : '-']);
-                doc.autoTable({ 
-                    head: [['Fecha', 'Presión', 'Momento', 'Estado', 'Peso']], 
-                    body: pressureRows, 
-                    startY: 35,
-                    headStyles: { fillColor: [15, 23, 42] }
-                });
+        function checkAnswer() {
+            state.isAnswering = true;
+            const isCorrect = state.selectedIdx === state.currentLevel.respuesta;
+            const cards = document.querySelectorAll('.option-card');
+            const btn = document.getElementById('btn-next');
 
-                // Tabla de Medicación
-                const lastY = doc.lastAutoTable.finalY + 15;
-                doc.text("HISTORIAL DE TOMA DE MEDICAMENTOS", 14, lastY);
-                const medsRows = takes.map(t => [new Date(t.date).toLocaleDateString(), new Date(t.date).toLocaleTimeString(), t.name]);
-                doc.autoTable({ 
-                    head: [['Fecha', 'Hora', 'Medicamento']], 
-                    body: medsRows, 
-                    startY: lastY + 5,
-                    headStyles: { fillColor: [16, 185, 129] }
-                });
+            cards[state.selectedIdx].classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) cards[state.currentLevel.respuesta].classList.add('correct');
 
-                doc.save(`HiperControl_Reporte_${Date.now()}.pdf`);
-                closeModals();
+            // Mostrar explicación
+            document.getElementById('explanation-text').innerText = state.currentLevel.explicacion;
+            document.getElementById('explanation').classList.remove('hidden');
+
+            if (isCorrect) {
+                confetti({ particleCount: 50, spread: 60, colors: ['#3b82f6', '#10b981'] });
+                if (state.currentLevel.id === state.progress) {
+                    state.progress++;
+                    state.stars += 25;
+                    save();
+                }
+                btn.innerText = "Siguiente Nivel";
+                btn.classList.replace('bg-blue-600', 'bg-emerald-600');
+            } else {
+                state.lives--;
+                updateHeader();
+                btn.innerText = state.lives > 0 ? "Reintentar Desafío" : "Sin Energía";
+                btn.classList.replace('bg-blue-600', 'bg-red-600');
             }
         }
 
-        function saveHealth() {
-            const sys = parseInt(document.getElementById('sys').value);
-            const dia = parseInt(document.getElementById('dia').value);
-            const peso = document.getElementById('peso').value;
-            if(!sys || !dia) return;
-
-            let status = { label: 'Óptima', bg: 'badge-verde' };
-            if(sys >= 140 || dia >= 90) status = { label: 'Hipertensión G2', bg: 'badge-rojo' };
-            else if(sys >= 130 || dia >= 85) status = { label: 'Hipertensión G1', bg: 'badge-rojo' };
-            else if(sys >= 120 || dia >= 80) status = { label: 'Elevada', bg: 'badge-amarillo' };
-
-            db.unshift({ id: Date.now(), type: 'pressure', sys, dia, peso, momento: document.getElementById('momento').value, date: Date.now(), status });
-            save();
-            document.getElementById('sys').value = '';
-            document.getElementById('dia').value = '';
+        function resetNextBtn() {
+            const btn = document.getElementById('btn-next');
+            btn.innerText = "Comprobar Respuesta";
+            btn.disabled = true;
+            btn.className = "w-full py-5 bg-slate-800 text-slate-500 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 tracking-widest uppercase";
         }
 
-        function addMedicine() {
-            const name = document.getElementById('mName').value;
-            if(!name) return;
-            meds.push({ id: Date.now(), name, time: document.getElementById('mTime').value });
-            save();
-            document.getElementById('mName').value = '';
+        function exitQuiz() {
+            document.getElementById('view-quiz').classList.add('hidden');
+            document.getElementById('view-map').classList.remove('hidden');
+            renderMap();
         }
 
-        function logTake(name) {
-            takes.unshift({ id: Date.now(), type: 'med', name, date: Date.now() });
-            save();
-            // Efecto visual simple
-            const feedback = document.createElement('div');
-            feedback.className = "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 text-white p-6 rounded-3xl z-[500] font-black italic uppercase text-xs";
-            feedback.innerHTML = `<i class="fas fa-check-circle text-emerald-400 mr-2"></i> Toma de ${name} Registrada`;
-            document.body.appendChild(feedback);
-            setTimeout(() => feedback.remove(), 1500);
-        }
-
-        function calcRisk() {
-            const s = document.getElementById('risk-smoke').checked;
-            const d = document.getElementById('risk-db').checked;
-            const se = document.getElementById('risk-sed').checked;
-            const ob = document.getElementById('risk-ob').checked;
-            
-            let score = (s?1:0)+(d?1:0)+(se?1:0)+(ob?1:0);
-            let lvl = "Mínimo", cls = "bg-emerald-500 text-white";
-            let msg = "Su perfil cardiovascular es saludable. Mantenga el ejercicio.";
-
-            if(score >= 4) { lvl = "Crítico"; cls = "bg-rose-600 text-white"; msg = "¡ALTA PRIORIDAD! Múltiples factores de riesgo detectados. Agende cita médica hoy."; }
-            else if(score === 3) { lvl = "Muy Alto"; cls = "bg-rose-500 text-white"; msg = "Riesgo coronario elevado. Requiere cambios urgentes en dieta."; }
-            else if(score === 2) { lvl = "Moderado"; cls = "bg-amber-500 text-white"; msg = "Vigilancia necesaria. Controle su peso y glucosa."; }
-            else if(score === 1) { lvl = "Leve"; cls = "bg-emerald-400 text-white"; msg = "Factor aislado detectado. No lo ignore."; }
-
-            const res = document.getElementById('riskResult');
-            res.innerHTML = `
-                <div class="p-8 rounded-3xl text-center font-black italic mt-4 ${cls}">
-                    <p class="uppercase text-[9px] opacity-70 mb-1 tracking-widest">Estado de Riesgo Cardiovascular</p>
-                    <p class="text-3xl uppercase italic mb-3">${lvl}</p>
-                    <p class="text-[10px] font-bold opacity-90 leading-tight uppercase">${msg}</p>
-                </div>
-            `;
-            res.classList.remove('hidden');
-        }
-
-        function deleteItem(id, list) {
-            if(list === 'db') db = db.filter(i => i.id !== id);
-            else if(list === 'meds') meds = meds.filter(i => i.id !== id);
-            else if(list === 'takes') takes = takes.filter(i => i.id !== id);
-            save();
+        function updateHeader() {
+            document.getElementById('life-count').innerText = state.lives;
+            document.getElementById('star-count').innerText = state.stars;
+            if (state.lives <= 0) showLifeModal();
         }
 
         function save() {
-            localStorage.setItem('hc_v12_records', JSON.stringify(db));
-            localStorage.setItem('hc_v12_meds', JSON.stringify(meds));
-            localStorage.setItem('hc_v12_takes', JSON.stringify(takes));
-            renderAll();
+            localStorage.setItem('electro_pro_prog', state.progress);
+            localStorage.setItem('electro_pro_stars', state.stars);
+            updateHeader();
         }
 
-        function renderAll() {
-            // Unificamos historial para la ventana principal
-            const combined = [...db, ...takes].sort((a,b) => b.date - a.date);
-            const tl = document.getElementById('unifiedTimeline');
-            
-            if(combined.length === 0) {
-                tl.innerHTML = `<div class="p-10 text-center opacity-20"><i class="fas fa-folder-open text-4xl mb-2"></i><p class="text-[10px] font-black uppercase">Sin registros</p></div>`;
-            } else {
-                tl.innerHTML = combined.map(item => {
-                    if(item.type === 'pressure') {
-                        return `
-                            <div class="card flex justify-between items-center border-l-8 border-rose-500 animate-fadeIn">
-                                <div class="flex-1">
-                                    <span class="status-badge ${item.status.bg}">${item.status.label}</span>
-                                    <div class="flex items-baseline gap-2">
-                                        <p class="text-3xl font-black italic text-slate-900">${item.sys}/${item.dia}</p>
-                                        <span class="text-[10px] font-bold text-slate-300 italic">mmHg</span>
-                                    </div>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase italic mt-1">
-                                        <i class="far fa-calendar mr-1"></i> ${new Date(item.date).toLocaleDateString()} • ${item.momento} ${item.peso ? '• <i class="fas fa-weight-scale ml-1"></i> '+item.peso+'kg' : ''}
-                                    </p>
-                                </div>
-                                <button onclick="deleteItem(${item.id}, 'db')" class="text-slate-200 hover:text-rose-500 transition-colors"><i class="fas fa-times-circle text-2xl"></i></button>
-                            </div>`;
-                    } else {
-                        return `
-                            <div class="card bg-emerald-50 border-emerald-100 flex justify-between items-center py-4">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-100"><i class="fas fa-check text-sm"></i></div>
-                                    <div>
-                                        <p class="text-[10px] font-black text-emerald-600 uppercase italic tracking-tighter">Toma de Medicamento</p>
-                                        <p class="text-sm font-black italic text-slate-900 leading-none mt-1">${item.name}</p>
-                                        <p class="text-[9px] font-bold text-emerald-400 uppercase mt-1 italic">${new Date(item.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
-                                    </div>
-                                </div>
-                                <button onclick="deleteItem(${item.id}, 'takes')" class="text-emerald-200 hover:text-rose-500 transition-colors px-2"><i class="fas fa-trash-alt text-lg"></i></button>
-                            </div>`;
-                    }
-                }).join('');
+        function showLifeModal() {
+            document.getElementById('life-modal').style.display = 'flex';
+            if (!document.querySelector('#paypal-container-V2J2E7EYWRR2U iframe')) {
+                PayPal.HostedButtons({ hostedButtonId: "V2J2E7EYWRR2U" }).render("#paypal-container-V2J2E7EYWRR2U");
             }
-
-            // Lista de medicamentos con botón de acción
-            const ml = document.getElementById('medsList');
-            ml.innerHTML = meds.map(m => `
-                <div class="card flex justify-between items-center py-4 border-slate-100">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center"><i class="fas fa-pills"></i></div>
-                        <div>
-                            <p class="font-black italic text-slate-900 text-sm leading-none">${m.name}</p>
-                            <p class="text-[10px] text-slate-400 uppercase font-black mt-1 italic"><i class="far fa-clock mr-1"></i> ${m.time || '--:--'}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="logTake('${m.name}')" class="bg-emerald-500 text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase btn-tap shadow-lg shadow-emerald-100">LOG</button>
-                        <button onclick="deleteItem(${m.id}, 'meds')" class="text-slate-200 px-2"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </div>
-            `).join('');
         }
 
-        function tab(id, btn) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
-            document.getElementById(`page-${id}`).classList.add('active');
-            btn.classList.add('nav-active');
-            window.scrollTo(0,0);
+        function closeLifeModal() {
+            document.getElementById('life-modal').style.display = 'none';
         }
 
-        function openExport() { document.getElementById('exportModal').style.display = 'flex'; }
-        function closeModals() { document.querySelectorAll('.modal').forEach(m => { if(m.id !== 'welcomeModal') m.style.display = 'none'; }); }
-        function confirmClear() { document.getElementById('confirmDeleteModal').style.display = 'flex'; }
-        function clearAllData() { localStorage.clear(); location.reload(); }
-        function closeWelcome() { localStorage.setItem('hc_v12_tos', 'true'); document.getElementById('welcomeModal').style.display = 'none'; }
-        
-        function updateHeaderDate() { 
-            const now = new Date();
-            const options = { weekday: 'long', day: 'numeric', month: 'short' };
-            document.getElementById('headerDate').innerText = now.toLocaleDateString('es-MX', options).toUpperCase(); 
-        }
-
-        function initPaypal() {
-            if(!window.paypal) return;
-            paypal.HostedButtons({
-                hostedButtonId: "WL5JJ94G938SW",
-                onApprove: (data) => {
-                    localStorage.setItem('hc_v12_pro', 'true');
-                    alert("¡Gracias por su apoyo! HiperControl Pro activado.");
-                    location.reload();
-                }
-            }).render("#paypal-container-WL5JJ94G938SW");
-        }
+        window.onload = () => {
+            renderMap();
+            updateHeader();
+        };
     </script>
 </body>
 </html>
